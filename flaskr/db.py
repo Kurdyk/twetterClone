@@ -13,12 +13,27 @@ def init_app(app):
     with app.app_context():
         db.init_app(app)
         db.create_all()
+        app.cli.add_command(add_random_user)
 
 
 def get_db():
     if 'db' not in g:
         g.db = db
     return g.db
+
+
+@click.command('add-random-user')
+def add_random_user():
+    from utils.tweet_text_generator import random_user
+    user = random_user()
+    new_user = User(
+        username=user["name"],
+        email=user["email"],
+        password=user["password"],
+    )
+    db.session.add(new_user)
+    db.session.commit()
+    click.echo('Added random user.')
 
 
 class User(db.Model):
