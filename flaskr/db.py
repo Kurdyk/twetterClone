@@ -39,10 +39,9 @@ def add_random_user():
 class User(db.Model):
     __tablename__ = "user"
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(24))
-    email = db.Column(db.String(50))
-    # TODO hash and store this properly
-    password = db.Column(db.String(24))
+    username = db.Column(db.String(24), nullable=False, unique=True)
+    email = db.Column(db.String(50), nullable=False)
+    password = db.Column(db.String(24), nullable=False)
 
     @property
     def serialize(self):
