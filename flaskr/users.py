@@ -5,10 +5,10 @@ from flask import (
 )
 from flaskr.db import User, get_db
 
-bp = Blueprint('users', __name__)
+bp = Blueprint('users', __name__, url_prefix='/users')
 
 
-@bp.route("/users/", methods=["GET"])
+@bp.route("/", methods=["GET"])
 def get_all_users_descending():
     db = get_db()
     users = db.session.query(User).order_by(User.id).all()
