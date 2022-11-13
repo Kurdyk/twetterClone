@@ -4,6 +4,7 @@ import functools
 from flask import (
     Blueprint, g, jsonify, redirect, render_template, request, session, url_for
 )
+from sqlalchemy import select
 from flaskr.db import User, get_db
 from werkzeug.security import check_password_hash, generate_password_hash
 
@@ -35,12 +36,22 @@ def load_logged_in_user():
 
 @bp.route('/login', methods=('GET', 'POST'))
 def login():
-    # TODO match the users credentials and log them in
-    # if request.method == 'POST':
-    #     username = request.form['username']
-    #     password = request.form['password']
-    #     db = get_db()
-    #     error = None
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        db = get_db()
+        error = None
+        user = db.session.query(User).where(User.username == username).first()
+
+        if user is None:
+            error = 'Incorrect username.'
+        elif not check_password_hash(user.password, password):
+            error = 'Incorrect password.'
+
+        if error is None:
+            session.clear()
+            session['user_id'] = user.id
+            return redirect(url_for('index'))
 
     return render_template('auth/register_login.html', action="login")
 
@@ -58,14 +69,20 @@ def register():
         elif not password:
             error = 'Password is required.'
 
-        # if error is None:
-            # try:
-            #     try inserting the user into the DB
-            # except db.IntegrityError:
-            #     error = f"User {username} is already registered."
-            # else:
-            #     return redirect(url_for("auth.login"))
+        if error is None:
+            try:
+                new_user = User(
+                    username=username,
+                    email=username,
+                    password=generate_password_hash(password),
+                )
+                db.session.add(new_user)
+                db.session.commit()
+            except db.IntegrityError:
+                error = f"User {username} is already registered."
+            else:
+                return redirect(url_for("auth.login"))
 
-        # flash(error)
+        flash(error)
 
     return render_template('auth/register_login.html', action="register")
