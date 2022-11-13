@@ -7,14 +7,43 @@ Login
 {% endif %}
 {% endblock %}
 
-<script src="/static/js/login.js"></script>
 {% block content %}
+<script type="text/javascript">
+    const page_action = "{{ action | safe }}"
 
+    function onLogin() {
+        const login_action = async () => {
+            let form_data = new FormData(document.querySelector('form'))
+
+            if (page_action == "login") {
+                target_url = "/auth/login"
+            } else {
+                target_url = "/auth/register"
+            }
+            const request = await fetch(target_url, {
+                "method": "POST",
+                "body": form_data
+            })
+            if (request.redirected) {
+                window.location = request.url
+            }
+        }
+        login_action.call()
+    }
+
+
+    window.onload = function () {
+        document.getElementById('loginSubmit').onclick = function (_) {
+            onLogin()
+        }
+    }
+
+</script>
 <div class="h-100 d-flex align-items-center justify-content-center">
     <div class="h-100 d-inline-flex flex-column justify-content-center mt-5 shadow mb-5 bg-white rounded">
         <nav class="nav navbar-custom">
             <li class="nav-item mx-auto">
-                <label class="navbar-custom">
+                <label class="navbar-text">
                     {% if action == "register" %}
                     REGISTER
                     {% elif action == "login" %}
@@ -26,19 +55,18 @@ Login
             <form>
                 <div class="form-group">
                     <label for="username">Username</label>
-                    <input type="email" class="form-control" id="username" aria-describedby="emailHelp"
+                    <input type="email" class="form-control" name="username" aria-describedby="emailHelp"
                         placeholder="Enter email" required>
                     <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone
                         else.</small>
                 </div>
                 <div class="form-group">
-                    <label for="exampleInputPassword1">Password</label>
-                    <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Password"
-                        required>
+                    <label for="password">Password</label>
+                    <input type="password" class="form-control" name="password" placeholder="Password" required>
                 </div>
-                <button type="submit" class="btn btn-primary">Submit</button>
             </form>
         </div>
+        <button class="btn btn-primary m-3" id="loginSubmit" class="btn btn-primary">Submit</button>
     </div>
 </div>
 
