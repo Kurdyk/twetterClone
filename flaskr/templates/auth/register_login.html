@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% block title %}
+{% if action == "register" %}
+Register
+{% elif action == "login" %}
+Login
+{% endif %}
+{% endblock %}
+
+<script src="/static/js/login.js"></script>
+{% block content %}
+
+<div class="h-100 d-flex align-items-center justify-content-center">
+    <div class="h-100 d-inline-flex flex-column justify-content-center mt-5 shadow mb-5 bg-white rounded">
+        <nav class="nav navbar-custom">
+            <li class="nav-item mx-auto">
+                <label class="navbar-custom">
+                    {% if action == "register" %}
+                    REGISTER
+                    {% elif action == "login" %}
+                    LOGIN
+                    {% endif %}</label>
+            </li>
+        </nav>
+        <div class="d-flex p-3">
+            <form>
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="email" class="form-control" id="username" aria-describedby="emailHelp"
+                        placeholder="Enter email" required>
+                    <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone
+                        else.</small>
+                </div>
+                <div class="form-group">
+                    <label for="exampleInputPassword1">Password</label>
+                    <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Password"
+                        required>
+                </div>
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
