@@ -10,3 +10,6 @@ Something like
 
 # Adding a random user
 `flask --app flaskr add-random-user`
+
+# Adding a random tweet
+`flask --app flaskr add-random-tweet`

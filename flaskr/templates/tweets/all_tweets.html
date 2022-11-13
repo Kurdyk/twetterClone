@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block styles %}
+{{super()}}
+    <link rel="stylesheet"  type="text/css" href="{{url_for('.static', filename='style.css')}}">
+{% endblock %}
+
+{% block header %}
+  <h2>{% block title %}Take a look on the lasted tweets{% endblock %}</h2>
+{% endblock %}
+
+{% block content %}
+    <ul class="tweet_list">
+    {% for tweet, author in tweets_authors: %}
+        <li class="tweet">
+            <h5 class="tweet_header"> From @{{author}}<br>Title: {{tweet.title}} </h5>
+            <p class="tweet_content"> {{tweet.content}} </p>
+        </li>
+    {% endfor %}
+    </ul>
+{% endblock %}
