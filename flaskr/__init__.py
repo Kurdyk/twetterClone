@@ -1,6 +1,7 @@
 import os
 
 from flask import Flask
+from flaskr.tweets import init_index
 
 
 def create_app(test_config=None):
@@ -33,5 +34,8 @@ def create_app(test_config=None):
     from . import tweets
     app.register_blueprint(tweets.bp)
     app.add_url_rule('/', endpoint='tweets.index')
+
+    with app.app_context():
+        init_index()
 
     return app
