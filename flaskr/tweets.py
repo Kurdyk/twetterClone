@@ -8,7 +8,7 @@ from flaskr.db import Tweet, get_db, User
 
 bp = Blueprint('tweets', __name__, url_prefix='/tweets')
 
-index = dict()  # used to store word -> tweet relationship
+tweet_index = dict()  # used to store word -> tweet relationship
 
 
 @bp.route("/all", methods=["GET"])
@@ -30,7 +30,8 @@ def index():
         authors.append(db.session.query(User.username).filter(
             tweet.uid == User.id).all()[0][0])
     return render_template('tweets/all_tweets.html', tweets_authors=zip(tweets, authors))
-    
+
+
 @bp.route("search_word/<word>", methods=["GET"])
 def search_for_word(word):
     db = get_db()
@@ -38,7 +39,7 @@ def search_for_word(word):
     tweets = list()
     word = word.lower()
     try:
-        all_ids = index[word]
+        all_ids = tweet_index[word]
     except KeyError:
         return render_template('tweets/all_tweets.html', tweets_authors=zip(tweets, authors))  # Empty page
     # removable when we figure out the join to get users and tweets together
@@ -60,7 +61,7 @@ def init_index():
             if word.isalnum():  # so we can search for number too if we want
                 word = word.lower()
                 try:
-                    index[word].append(tweet.id)
+                    tweet_index[word].append(tweet.id)
                 except KeyError:
-                    index[word] = [tweet.id]
+                    tweet_index[word] = [tweet.id]
     return None
