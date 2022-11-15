@@ -28,7 +28,7 @@ def get_all_tweets():
     return render_template('tweets/all_tweets.html', tweets_authors=zip(tweets, authors))
 
 
-@bp.route("/<word>", methods=["GET"])
+@bp.route("search_word/<word>", methods=["GET"])
 def search_for_word(word):
     db = get_db()
     authors = list()
@@ -38,6 +38,7 @@ def search_for_word(word):
         all_ids = index[word]
     except KeyError:
         return render_template('tweets/all_tweets.html', tweets_authors=zip(tweets, authors))  # Empty page
+    # removable when we figure out the join to get users and tweets together
     for tweet_id in all_ids:
         tweets += db.session.query(Tweet).order_by(Tweet.id.desc()).filter(Tweet.id == tweet_id).all()
     for tweet in tweets:
