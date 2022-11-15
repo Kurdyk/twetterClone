@@ -1,21 +1,23 @@
 {% extends 'base.html' %}
 
-{% block styles %}
-{{super()}}
-    <link rel="stylesheet"  type="text/css" href="{{url_for('.static', filename='style.css')}}">
-{% endblock %}
-
 {% block header %}
-  <h2>{% block title %}Take a look on the lasted tweets{% endblock %}</h2>
+<h2>{% block title %}Tweets{% endblock %}</h2>
 {% endblock %}
 
 {% block content %}
-    <ul class="tweet_list">
-    {% for tweet, author in tweets_authors: %}
-        <li class="tweet">
-            <h5 class="tweet_header"> From @{{author}}<br>Title: {{tweet.title}} </h5>
-            <p class="tweet_content"> {{tweet.content}} </p>
+<div>
+    <ul class="list-group ">
+        {% for tweet, author in tweets_authors: %}
+        <li class="list-group-item" id="{{tweet.id}}">
+            <div class="flex-column">
+                <div>
+                    <h5 class="fs-1"> Author: @{{author}}</h5>
+                    <h6 class="fw-bold">Title: @{{tweet.title}}</h6>
+                    <p> Content: {{tweet.content}} </p>
+                </div>
+            </div>
         </li>
-    {% endfor %}
+        {% endfor %}
     </ul>
+</div>
 {% endblock %}

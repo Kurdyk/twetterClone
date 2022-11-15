@@ -1,8 +1,7 @@
-from curses import flash
 import functools
 
 from flask import (
-    Blueprint, g, jsonify, redirect, render_template, request, session, url_for
+    Blueprint, flash, g, jsonify, redirect, render_template, request, session, url_for
 )
 from sqlalchemy import select
 from flaskr.db import User, get_db
@@ -25,13 +24,10 @@ def login_required(view):
 @bp.before_app_request
 def load_logged_in_user():
     user_id = session.get('user_id')
-
     if user_id is None:
         g.user = None
     else:
-        g.user = get_db().execute(
-            'SELECT * FROM user WHERE id = ?', (user_id,)
-        ).fetchone()
+        g.user = get_db().session.query(User).where(User.id == user_id).first()
 
 
 @bp.route('/login', methods=('GET', 'POST'))
@@ -51,7 +47,9 @@ def login():
         if error is None:
             session.clear()
             session['user_id'] = user.id
-            return redirect(url_for('index'))
+            return redirect(url_for("tweets.index"))
+
+        return error, 401
 
     return render_template('auth/register_login.html', action="login")
 
@@ -81,8 +79,14 @@ def register():
             except db.IntegrityError:
                 error = f"User {username} is already registered."
             else:
-                return redirect(url_for("auth.login"))
+                return redirect(url_for("tweets.index"))
 
         flash(error)
 
     return render_template('auth/register_login.html', action="register")
+
+
+@bp.route('/logout', methods=['POST'])
+def logout():
+    session.clear()
+    return redirect(url_for('tweets.index'))

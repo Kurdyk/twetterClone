@@ -13,6 +13,7 @@ Login
 
     function onLogin() {
         const login_action = async () => {
+            document.getElementById('loginError').style.display = 'none';
             let form_data = new FormData(document.querySelector('form'))
 
             if (page_action == "login") {
@@ -24,6 +25,9 @@ Login
                 "method": "POST",
                 "body": form_data
             })
+            if (!request.ok && request.status == 401) {
+                document.getElementById('loginError').style.display = 'block';
+            }
             if (request.redirected) {
                 window.location = request.url
             }
@@ -33,9 +37,17 @@ Login
 
 
     window.onload = function () {
+        document.getElementById('loginError').style.display = 'none';
         document.getElementById('loginSubmit').onclick = function (_) {
             onLogin()
         }
+        var input = document.getElementById("password");
+        input.addEventListener("keypress", function (event) {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                onLogin()
+            }
+        });
     }
 
 </script>
@@ -62,11 +74,15 @@ Login
                 </div>
                 <div class="form-group">
                     <label for="password">Password</label>
-                    <input type="password" class="form-control" name="password" placeholder="Password" required>
+                    <input id="password" type="password" class="form-control" name="password" placeholder="Password"
+                        required>
+                </div>
+                <div id="loginError" class="invalid-feedback">
+                    Oops! Invalid username or password.
                 </div>
             </form>
         </div>
-        <button class="btn btn-primary m-3" id="loginSubmit" class="btn btn-primary">Submit</button>
+        <button class="btn btn-primary m-3" id="loginSubmit" class="btn btn-primary" type="submit">Submit</button>
     </div>
 </div>
 

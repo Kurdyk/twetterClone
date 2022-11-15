@@ -13,6 +13,27 @@
 
 
     <title>{% block title %}{% endblock %} - Twetter</title>
+
+    <script>
+        function onLogout() {
+            const logout_action = async () => {
+                target_url = '/auth/logout'
+                const request = await fetch(target_url, {
+                    "method": "POST",
+                })
+                if (request.redirected) {
+                    window.location = request.url
+                }
+            }
+            logout_action.call()
+        }
+
+        window.onload = function () {
+            document.getElementById('logoutButton').onclick = function (_) {
+                onLogout()
+            }
+        }
+    </script>
 </head>
 
 <nav class="nav navbar-custom ">
@@ -26,7 +47,11 @@
     </ul>
 
     {% if g.user %}
-
+    <ul class="navbar-nav mr-3">
+        <li class="nav-item">
+            <a id="logoutButton" class="nav-link" href="">Log Out</a>
+        </li>
+    </ul>
     {% else %}
     <ul class="navbar-nav mr-3">
         <li class="nav-item">
