@@ -86,7 +86,7 @@ def register():
     return render_template('auth/register_login.html', action="register")
 
 
-@bp.route('/logout', methods=['POST'])
+@bp.route('/logout', methods=['GET', 'POST'])
 def logout():
     session.clear()
     return redirect(url_for('tweets.index'))

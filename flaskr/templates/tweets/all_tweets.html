@@ -5,6 +5,41 @@
 {% endblock %}
 
 {% block content %}
+<script>
+    function submitTweet() {
+        const submit_tweet_action = async () => {
+            let form_data = new FormData(document.querySelector('form'));
+            var target_url = "tweets/new_tweet";
+
+            const request = await fetch(target_url, {
+                "method": "POST",
+                "body": form_data
+            });
+            if (request.redirected) {
+                window.location = request.url;
+            }
+        };
+       submit_tweet_action.call();
+    }
+</script>
+
+<div class="form-group w-50 m-4">
+    <form>
+        <label for="title">Tell us what it is about</label>
+        <textarea class="form-control" id="title" rows="1"></textarea>
+
+        <label for="content">Tell us what you think</label>
+        <textarea class="form-control" id="content" rows="4"></textarea>
+
+        <small id="under_text" class="form-text text-muted">Always happy to see you.</small>
+
+        <div class="col-md-12 bg-light text-right">
+            <button type="button" class="btn btn-primary" onclick="submitTweet()">Primary</button>
+        </div>
+    </form>
+</div>
+
+
 <div>
     <ul class="list-group ">
         {% for tweet, author in tweets_authors: %}
