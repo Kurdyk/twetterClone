@@ -32,12 +32,13 @@ def index():
     return render_template('tweets/all_tweets.html', tweets_authors=zip(tweets, authors))
 
 
-@bp.route("search_word/<word>", methods=["GET"])
-def search_for_word(word):
+@bp.route("/search_word", methods=["GET"])
+def search_for_word():
     db = get_db()
     authors = list()
     tweets = list()
-    word = word.lower()
+    # Do we need to sanitize the input?
+    word = request.args.get('search')
     try:
         all_ids = tweet_index[word]
     except KeyError:
@@ -80,6 +81,7 @@ def update_index(tweet: Tweet):
 def add_new_tweet():
     user_id = session["user_id"]
     title = request.form["title"]
+    # We need to sanitize the input
     content = request.form["content"]
     db = get_db()
 
@@ -94,4 +96,5 @@ def add_new_tweet():
     except db.IntegrityError:
         return 'DB Integrity Error', 505
     else:
+        update_index(new_tweet)
         return redirect(url_for("tweets.index"))
