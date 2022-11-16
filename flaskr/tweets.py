@@ -75,21 +75,14 @@ def update_index(tweet: Tweet):
     return None
 
 
-@bp.route("/new_tweet", methods=["GET", "POST"])
+@bp.route("/new_tweet", methods=["POST"])
 @login_required
 def add_new_tweet():
-    if request.method == "GET":
-        return
-    # For test purposes
     user_id = session["user_id"]
-    print(request.form.to_dict())
     title = request.form["title"]
     content = request.form["content"]
-    print(user_id, title, content)
-    # Untested because it crashes before
     db = get_db()
-    author = db.session.query(User.id).filter(
-        User.username == user_id).all()  # might miss some [0][0]
+
     try:
         new_tweet = Tweet(
             uid=user_id,
@@ -99,7 +92,6 @@ def add_new_tweet():
         db.session.add(new_tweet)
         db.session.commit()
     except db.IntegrityError:
-        print("DB intergrity error")
-        return redirect(url_for("tweets.index"))
+        return 'DB Integrity Error', 505
     else:
         return redirect(url_for("tweets.index"))

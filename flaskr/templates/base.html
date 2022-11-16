@@ -27,12 +27,6 @@
             }
             logout_action.call()
         }
-
-        window.onload = function () {
-            document.getElementById('logoutButton').onclick = function (_) {
-                onLogout()
-            }
-        }
     </script>
 </head>
 
@@ -49,7 +43,7 @@
     {% if g.user %}
     <ul class="navbar-nav mr-3">
         <li class="nav-item">
-            <a id="logoutButton" class="nav-link" href="">Log Out</a>
+            <a id="logoutButton" class="nav-link" href="" onclick="onLogout()">Log Out</a>
         </li>
     </ul>
     {% else %}
