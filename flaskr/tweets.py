@@ -41,12 +41,15 @@ def search_for_word(word):
     try:
         all_ids = tweet_index[word]
     except KeyError:
-        return render_template('tweets/all_tweets.html', tweets_authors=zip(tweets, authors))  # Empty page
+        # Empty page
+        return render_template('tweets/all_tweets.html', tweets_authors=zip(tweets, authors))
     # removable when we figure out the join to get users and tweets together
     for tweet_id in all_ids:
-        tweets += db.session.query(Tweet).order_by(Tweet.id.desc()).filter(Tweet.id == tweet_id).all()
+        tweets += db.session.query(Tweet).order_by(Tweet.id.desc()
+                                                   ).filter(Tweet.id == tweet_id).all()
     for tweet in tweets:
-        authors.append(db.session.query(User.username).filter(tweet.uid == User.id).all()[0][0])
+        authors.append(db.session.query(User.username).filter(
+            tweet.uid == User.id).all()[0][0])
     return render_template('tweets/all_tweets.html', tweets_authors=zip(tweets, authors))
 
 
@@ -85,10 +88,11 @@ def add_new_tweet():
     print(user_id, title, content)
     # Untested because it crashes before
     db = get_db()
-    author = db.session.query(User.id).filter(User.username == user_id).all()  # might miss some [0][0]
+    author = db.session.query(User.id).filter(
+        User.username == user_id).all()  # might miss some [0][0]
     try:
         new_tweet = Tweet(
-            uid=author,
+            uid=user_id,
             title=title,
             content=content,
         )
