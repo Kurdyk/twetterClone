@@ -1,6 +1,6 @@
 
 from flask import (
-    Blueprint, g, jsonify, render_template
+    Blueprint, g, jsonify, render_template, session, request, redirect, url_for
 )
 from flaskr.auth import login_required
 
@@ -41,12 +41,15 @@ def search_for_word(word):
     try:
         all_ids = tweet_index[word]
     except KeyError:
-        return render_template('tweets/all_tweets.html', tweets_authors=zip(tweets, authors))  # Empty page
+        # Empty page
+        return render_template('tweets/all_tweets.html', tweets_authors=zip(tweets, authors))
     # removable when we figure out the join to get users and tweets together
     for tweet_id in all_ids:
-        tweets += db.session.query(Tweet).order_by(Tweet.id.desc()).filter(Tweet.id == tweet_id).all()
+        tweets += db.session.query(Tweet).order_by(Tweet.id.desc()
+                                                   ).filter(Tweet.id == tweet_id).all()
     for tweet in tweets:
-        authors.append(db.session.query(User.username).filter(tweet.uid == User.id).all()[0][0])
+        authors.append(db.session.query(User.username).filter(
+            tweet.uid == User.id).all()[0][0])
     return render_template('tweets/all_tweets.html', tweets_authors=zip(tweets, authors))
 
 
@@ -56,12 +59,39 @@ def init_index():
     """
     tweets = get_db().session.query(Tweet).order_by(Tweet.id.desc()).all()
     for tweet in tweets:
-        content = tweet.content + " " + tweet.title
-        for word in content.split(" "):
-            if word.isalnum():  # so we can search for number too if we want
-                word = word.lower()
-                try:
-                    tweet_index[word].append(tweet.id)
-                except KeyError:
-                    tweet_index[word] = [tweet.id]
+        update_index(tweet)
     return None
+
+
+def update_index(tweet: Tweet):
+    content = tweet.content + " " + tweet.title
+    for word in content.split(" "):
+        if word.isalnum():  # so we can search for number too if we want
+            word = word.lower()
+            try:
+                tweet_index[word].append(tweet.id)
+            except KeyError:
+                tweet_index[word] = [tweet.id]
+    return None
+
+
+@bp.route("/new_tweet", methods=["POST"])
+@login_required
+def add_new_tweet():
+    user_id = session["user_id"]
+    title = request.form["title"]
+    content = request.form["content"]
+    db = get_db()
+
+    try:
+        new_tweet = Tweet(
+            uid=user_id,
+            title=title,
+            content=content,
+        )
+        db.session.add(new_tweet)
+        db.session.commit()
+    except db.IntegrityError:
+        return 'DB Integrity Error', 505
+    else:
+        return redirect(url_for("tweets.index"))
