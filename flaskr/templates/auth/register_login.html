@@ -14,7 +14,7 @@ Login
     function onLogin() {
         const login_action = async () => {
             document.getElementById('loginError').style.display = 'none';
-            let form_data = new FormData(document.querySelector('form'))
+            let form_data = new FormData(document.getElementById('authForm'))
 
             if (page_action == "login") {
                 target_url = "/auth/login"
@@ -64,7 +64,7 @@ Login
             </li>
         </nav>
         <div class="d-flex p-3">
-            <form>
+            <form id="authForm">
                 <div class="form-group">
                     <label for="username">Username</label>
                     <input type="email" class="form-control" name="username" aria-describedby="emailHelp"

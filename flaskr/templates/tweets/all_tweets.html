@@ -8,7 +8,7 @@
 <script>
     function submitTweet() {
         const submit_tweet_action = async () => {
-            let form_data = new FormData(document.querySelector('form'));
+            let form_data = new FormData(document.getElementById('createTweetForm'));
 
             var target_url = "/tweets/new_tweet";
 
@@ -30,15 +30,15 @@
     }
 </script>
 
-<div class="w-50 m-4">
-    <form>
+<div class="w-50 mb-4">
+    <form id="createTweetForm">
         <div class="form-group">
             <label for="title">Tell us what it is about</label>
             <input class="form-control" id="title" name="title" rows="1" required>
         </div>
         <div class="form-group">
             <label for="content">Tell us what you think</label>
-            <input class="form-control" id="content" name="content" rows="4" required>
+            <textarea class="form-control" id="content" name="content" rows="4" required></textarea>
         </div>
         <small id="under_text" class="form-text text-muted">Always happy to see you.</small>
 
