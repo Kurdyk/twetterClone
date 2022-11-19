@@ -8,9 +8,15 @@
 <script>
     function submitTweet() {
         const submit_tweet_action = async () => {
+            document.getElementById('createTweetError').style.display = 'none'
             let form_data = new FormData(document.getElementById('createTweetForm'));
 
             var target_url = "/tweets/new_tweet";
+
+            if (form_data.get('title') == "" || form_data.get('content') == "") {
+                document.getElementById('createTweetError').style.display = 'block'
+                return
+            }
 
             const request = await fetch(target_url, {
                 "method": "POST",
@@ -24,6 +30,7 @@
     }
 
     window.onload = function () {
+        document.getElementById('createTweetError').style.display = 'none'
         document.getElementById('tweet_submit').onclick = function (_) {
             submitTweet()
         }
@@ -40,8 +47,10 @@
             <label for="content">Tell us what you think</label>
             <textarea class="form-control" id="content" name="content" rows="4" required></textarea>
         </div>
+        <p id="createTweetError" class="text-danger">
+            Oops! Missing a required field
+        </p>
         <small id="under_text" class="form-text text-muted">Always happy to see you.</small>
-
         <div class="text-right">
             <button type="button" class="btn btn-primary" id="tweet_submit">Submit Tweet</button>
         </div>
@@ -50,7 +59,7 @@
 
 
 <div>
-    <ul class="list-group ">
+    <ul class="list-group">
         {% for tweet, author in tweets_authors: %}
         <li class="list-group-item" id="{{tweet.id}}">
             <div class="flex-column">
