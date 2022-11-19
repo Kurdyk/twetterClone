@@ -35,39 +35,26 @@
 </head>
 
 <body style="padding-top: 5rem">
-    <nav class="nav navbar-custom fixed-top">
-        <ul class="navbar-nav mr-auto">
-            <li class="nav-item">
-                <a class="navbar-brand" href="/">
-                    <img src="/static/assets/twitter-32.png" width="32" height="32" class="d-inline-block align-top"
-                        alt="">
-                    Twetter
-                </a>
-            </li>
-        </ul>
+    <nav class="nav navbar-custom fixed-top" style="padding: .5rem">
+
+        <a class="navbar-brand mr-auto" href="/">
+            <img src="/static/assets/twitter-32.png" width="32" height="32" class="d-inline-block align-top" alt="">
+            Twetter
+        </a>
 
         {% if g.user %}
-        <ul class="navbar-nav mr-3">
-            <li class="nav-item">
-                <a id="logoutButton" class="nav-link" href="" onclick="onLogout()">Log Out</a>
-            </li>
-        </ul>
+
+        <a class="nav-link mr-3" id="logoutButton" class="nav-link" href="#" onclick="onLogout()">Log Out</a>
+
         <form class="form-inline" id="searchForm" action="/tweets/search_word" method="get" onsubmit="onSearch()">
             <input class="form-control mr-sm-2" id="search" name="search" type="search" placeholder="Search"
                 aria-label="Search" required>
             <button class="btn btn-outline-light my-2 my-sm-0">Search</button>
         </form>
         {% else %}
-        <ul class="navbar-nav mr-3">
-            <li class="nav-item">
-                <a class="nav-link" href="{{ url_for('auth.login') }}">Log In</a>
-            </li>
-        </ul>
-        <ul class="navbar-nav">
-            <li class="nav-item">
-                <a class="nav-link" href="{{ url_for('auth.register') }}">Register</a>
-            </li>
-        </ul>
+        <a class="nav-link mr-3" href="{{ url_for('auth.login') }}">Log In</a>
+
+        <a class="nav-link mr-3" href="{{ url_for('auth.register') }}">Register</a>
         {% endif %}
 
     </nav>
