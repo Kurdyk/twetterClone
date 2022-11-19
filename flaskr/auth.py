@@ -1,4 +1,5 @@
 import functools
+import time
 
 from flask import (
     Blueprint, flash, g, jsonify, redirect, render_template, request, session, url_for
@@ -33,11 +34,11 @@ def load_logged_in_user():
 @bp.route('/login', methods=('GET', 'POST'))
 def login():
     if request.method == 'POST':
-        username = request.form['username']
+        email = request.form['email']
         password = request.form['password']
         db = get_db()
         error = None
-        user = db.session.query(User).where(User.username == username).first()
+        user = db.session.query(User).where(User.email == email).first()
 
         if user is None:
             error = 'Incorrect username.'
@@ -57,6 +58,7 @@ def login():
 @bp.route('/register', methods=('GET', 'POST'))
 def register():
     if request.method == 'POST':
+        email = request.form['email']
         username = request.form['username']
         password = request.form['password']
         db = get_db()
@@ -66,22 +68,23 @@ def register():
             error = 'Username is required.'
         elif not password:
             error = 'Password is required.'
+        elif not email:
+            error = 'Email is required'
 
         if error is None:
             try:
                 new_user = User(
                     username=username,
-                    email=username,
+                    email=email,
                     password=generate_password_hash(password),
                 )
                 db.session.add(new_user)
                 db.session.commit()
-            except db.IntegrityError:
-                error = f"User {username} is already registered."
+            except Exception:  # Not good I know but it works where db.IntegrityError doesn't
+                error = f"User {username} is already registered or {email} is already used."
+                return error, 402
             else:
                 return redirect(url_for("tweets.index"))
-
-        flash(error)
 
     return render_template('auth/register_login.html', action="register")
 
