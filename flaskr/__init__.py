@@ -2,6 +2,7 @@ import os
 
 from flask import Flask
 from flaskr.tweets import init_index
+from flaskr.users import init_user_index
 
 
 def create_app(test_config=None):
@@ -37,5 +38,6 @@ def create_app(test_config=None):
 
     with app.app_context():
         init_index()
+        init_user_index()
 
     return app

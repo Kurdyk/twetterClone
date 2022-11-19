@@ -84,6 +84,8 @@ def register():
                 error = f"User {username} is already registered or {email} is already used."
                 return error, 402
             else:
+                from flaskr.users import update_user_index
+                update_user_index(new_user)
                 return redirect(url_for("tweets.index"))
 
     return render_template('auth/register_login.html', action="register")
