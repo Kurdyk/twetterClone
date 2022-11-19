@@ -86,6 +86,8 @@ def register():
             else:
                 from flaskr.users import update_user_index
                 update_user_index(new_user)
+                session.clear()
+                session['user_id'] = new_user.id
                 return redirect(url_for("tweets.index"))
 
     return render_template('auth/register_login.html', action="register")
