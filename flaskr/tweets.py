@@ -38,7 +38,7 @@ def search_for_word():
     authors = list()
     tweets = list()
     # Do we need to sanitize the input?
-    word = request.args.get('search')
+    word = request.args.get('search').lower()  # the index is in lower case
     try:
         all_ids = tweet_index[word]
     except KeyError:
@@ -70,9 +70,9 @@ def update_index(tweet: Tweet):
         if word.isalnum():  # so we can search for number too if we want
             word = word.lower()
             try:
-                tweet_index[word].append(tweet.id)
+                tweet_index[word].add(tweet.id)
             except KeyError:
-                tweet_index[word] = [tweet.id]
+                tweet_index[word] = {tweet.id}
     return None
 
 
