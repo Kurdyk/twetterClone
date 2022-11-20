@@ -5,8 +5,8 @@ from flask import (
 )
 
 from flaskr.db import User, get_db, Tweet
-
 from flaskr.auth import login_required
+from flaskr.follows import is_following, get_followed, get_followers
 
 
 bp = Blueprint('users', __name__, url_prefix='/users')
@@ -42,7 +42,7 @@ def init_user_index():
 def search_for_email(username):
     # Find the user
     # username = request.args.get('search')
-    try :
+    try:
         user = user_index[username]
     except KeyError:
         return "No such user", 402
@@ -50,4 +50,9 @@ def search_for_email(username):
     db = get_db()
     tweets = db.session.query(Tweet).order_by(Tweet.id.desc()).filter(Tweet.uid == user.id).all()
     own_profile = session['user_id'] == user.id
-    return render_template('users/profile.html', user=user, tweets=tweets, own_profile=own_profile)
+    already_follows = is_following(username)
+    followers = get_followers(username)
+    followed = get_followed(username)
+    return render_template('users/profile.html', user=user, tweets=tweets,
+                           own_profile=own_profile, already_follows=already_follows,
+                           followed=followed, followers=followers, nb_followers=len(followers))

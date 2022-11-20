@@ -89,6 +89,19 @@ class Tweet(db.Model):
         }
 
 
+class Follow(db.Model):
+    __tablename__ = "follows"
+    follower_id = db.Column(db.Integer, db.ForeignKey("user.id"), primary_key=True, nullable=False)
+    followed_id = db.Column(db.Integer, db.ForeignKey("user.id"), primary_key=True, nullable=False)
+
+    @property
+    def serialize(self):
+        return {
+            "follower_id": self.follower_id,
+            "followed_id": self.followed_id
+        }
+
+
 class Like(db.Model):
     __tablename__ = "likes"
     id = db.Column(db.Integer, primary_key=True)

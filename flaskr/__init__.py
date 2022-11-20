@@ -36,6 +36,9 @@ def create_app(test_config=None):
     app.register_blueprint(tweets.bp)
     app.add_url_rule('/', endpoint='tweets.index')
 
+    from . import follows
+    app.register_blueprint(follows.bp)
+
     with app.app_context():
         init_index()
         init_user_index()
