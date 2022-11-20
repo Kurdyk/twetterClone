@@ -98,3 +98,17 @@ def add_new_tweet():
     else:
         update_index(new_tweet)
         return redirect(url_for("tweets.index"))
+
+
+@bp.route("/get", methods=["GET"])
+def getTweet():
+    tweetId = request.args.get('id')
+    db = get_db()
+    try:
+        rows = db.session.query(Tweet, User).join(User).filter(
+            Tweet.id == tweetId and User.id == Tweet.uid).first()
+
+        return dict(zip(['tweet', 'user'], [i.serialize for i in rows])), 200
+    except Exception as e:
+        print(e)
+        return 'Unable to find tweet', 404
