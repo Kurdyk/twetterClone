@@ -6,7 +6,7 @@ from flask import (
 
 from flaskr.db import User, get_db, Tweet
 from flaskr.auth import login_required
-from flaskr.follows import is_following
+from flaskr.follows import is_following, get_followed, get_followers
 
 
 bp = Blueprint('users', __name__, url_prefix='/users')
@@ -51,5 +51,8 @@ def search_for_email(username):
     tweets = db.session.query(Tweet).order_by(Tweet.id.desc()).filter(Tweet.uid == user.id).all()
     own_profile = session['user_id'] == user.id
     already_follows = is_following(username)
+    followers = get_followers(username)
+    followed = get_followed(username)
     return render_template('users/profile.html', user=user, tweets=tweets,
-                           own_profile=own_profile, already_follows=already_follows)
+                           own_profile=own_profile, already_follows=already_follows,
+                           followed=followed, followers=followers, nb_followers=len(followers))

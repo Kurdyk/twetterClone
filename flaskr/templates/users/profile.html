@@ -55,73 +55,106 @@
 
 </script>
 
-<section class="vh-20" style="background-color: #9de2ff;">
-    <div class="container py-5 h-50">
-        <div class="row d-flex justify-content-center align-items-center h-100">
-            <div class="col col-md-9 col-lg-7 col-xl-5">
-                <div class="card" style="border-radius: 15px;">
-                    <div class="card-body p-4">
-                        <div class="d-flex text-black">
-                            <div class="flex-grow-1 ms-3">
-                                <h5 class="mb-1">@ {{user.username}}</h5>
-                                <div class="d-flex justify-content-start rounded-3 p-2 mb-2"
-                                     style="background-color: #efefef;">
-                                    <div>
-                                        <p class="small text-muted mb-1">Tweets</p>
-                                        <p class="mb-0">{{tweets|length}}</p>
+<div class="container">
+
+    <div class="row">
+        <section class="col-10" style="background-color: #9de2ff;">
+            <div class="container py-5 h-50">
+                <div class="row d-flex justify-content-center align-items-center h-100">
+                    <div class="col col-md-9 col-lg-7 col-xl-5">
+                        <div class="card" style="border-radius: 15px;">
+                            <div class="card-body p-4">
+                                <div class="d-flex text-black">
+                                    <div class="flex-grow-1 ms-3">
+                                        <h5 class="mb-1">@{{user.username}}</h5>
+                                        <div class="d-flex justify-content-start rounded-3 p-2 mb-2"
+                                             style="background-color: #efefef;">
+                                            <div>
+                                                <p class="small text-muted mb-1">Tweets</p>
+                                                <p class="mb-0">{{tweets|length}}</p>
+                                            </div>
+                                            <div class="px-3">
+                                                <p class="small text-muted mb-1">Followers</p>
+                                                <p class="mb-0">{{nb_followers}}</p>
+                                            </div>
+                                            <div class="px-3">
+                                                <p class="small text-muted mb-1">Email</p>
+                                                <p class="mb-0">{{user.email}}</p>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex pt-1">
+                                            {% if own_profile : %}
+                                            <button type="button" class="btn btn-danger flex-grow-1 m-1">Delete</button>
+                                            {% else %}
+                                                {% if already_follows : %}
+                                                <button type="button"
+                                                        class="btn btn-primary flex-grow-1 m-1"
+                                                        id="followButton"
+                                                        style="background-color: cornflowerblue"
+                                                        onclick="submitFollow()">Follow
+                                                </button>
+                                                {% else %}
+                                                <button type="button"
+                                                        class="btn btn-primary flex-grow-1 m-1"
+                                                        id="followButton"
+                                                        style="background-color: red"
+                                                        onclick="submitUnfollow()">Unfollow
+                                                </button>
+                                                {% endif %}
+                                            {% endif %}
+                                        </div>
                                     </div>
-                                    <div class="px-3">
-                                        <p class="small text-muted mb-1">Followers</p>
-                                        <p class="mb-0">XXX</p>
-                                    </div>
-                                    <div class="px-3">
-                                        <p class="small text-muted mb-1">Email</p>
-                                        <p class="mb-0">{{user.email}}</p>
-                                    </div>
-                                </div>
-                                <div class="d-flex pt-1">
-                                    {% if own_profile : %}
-                                    <button type="button" class="btn btn-danger flex-grow-1 m-1">Delete</button>
-                                    {% else %}
-                                        {% if already_follows : %}
-                                        <button type="button"
-                                                class="btn btn-primary flex-grow-1 m-1"
-                                                id="followButton"
-                                                style="background-color: cornflowerblue"
-                                                onclick="submitFollow()">Follow
-                                        </button>
-                                        {% else %}
-                                        <button type="button"
-                                                class="btn btn-primary flex-grow-1 m-1"
-                                                id="followButton"
-                                                style="background-color: red"
-                                                onclick="submitUnfollow()">Unfollow
-                                        </button>
-                                        {% endif %}
-                                    {% endif %}
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+            <div>
+            <ul class="list-group ">
+                {% for tweet in tweets: %}
+                <li class="list-group-item" id="{{tweet.id}}">
+                    <div class="flex-column">
+                        <div>
+                            <h5 class="fs-1"> Author: @{{user.username}}</h5>
+                            <h6 class="fw-bold">Title: {{tweet.title}}</h6>
+                            <p> Content: {{tweet.content}} </p>
+                        </div>
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+        </section>
+
+        <div class="col">
+            <ul class="list-group m-1">
+                <h5>Followers</h5>
+                {% for user in followers: %}
+                <li class="list-group-item">
+                    <div class="flex-column">
+                        <div>
+                            <a style="color: black;" href="/users/search/{{user.username}}">@{{user.username}}</a>
+                        </div>
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+
+            <ul class="list-group m-1">
+                <h5>Followed users</h5>
+                {% for user in followed: %}
+                <li class="list-group-item">
+                    <div class="flex-column">
+                        <div>
+                            <a style="color: black;" href="/users/search/{{user.username}}">@{{user.username}}</a>
+                        </div>
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+
         </div>
     </div>
-</section>
-
-<div>
-    <ul class="list-group ">
-        {% for tweet in tweets: %}
-        <li class="list-group-item" id="{{tweet.id}}">
-            <div class="flex-column">
-                <div>
-                    <h5 class="fs-1"> Author: @{{user.username}}</h5>
-                    <h6 class="fw-bold">Title: {{tweet.title}}</h6>
-                    <p> Content: {{tweet.content}} </p>
-                </div>
-            </div>
-        </li>
-        {% endfor %}
-    </ul>
 </div>
 {% endblock %}
