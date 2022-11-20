@@ -4,7 +4,7 @@ from flask import current_app, g
 from select import select
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import select
+from sqlalchemy import func, select
 
 db = SQLAlchemy()
 
@@ -55,7 +55,8 @@ class User(db.Model):
     __tablename__ = "user"
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(24), nullable=False, unique=True)
-    email = db.Column(db.String(50), nullable=False, unique=True)  # needed for login so unique is a good idea
+    # needed for login so unique is a good idea
+    email = db.Column(db.String(50), nullable=False, unique=True)
     password = db.Column(db.String(24), nullable=False)
 
     @property
@@ -63,6 +64,7 @@ class User(db.Model):
         return {
             'id': self.id,
             'username': self.username,
+            'email': self.email,
             'password': self.password
         }
 
@@ -73,6 +75,8 @@ class Tweet(db.Model):
     uid = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     title = db.Column(db.String(256), nullable=False)
     content = db.Column(db.String(2048), nullable=False)
+    time_created = db.Column(db.DateTime(
+        timezone=True), server_default=func.now())
 
     @property
     def serialize(self):
@@ -80,5 +84,6 @@ class Tweet(db.Model):
             'id': self.id,
             'uid': self.uid,
             'title': self.title,
-            'content': self.content
+            'content': self.content,
+            'time_created': self.time_created,
         }
