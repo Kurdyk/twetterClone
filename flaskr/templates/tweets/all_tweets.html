@@ -49,6 +49,30 @@
         fetch_tweet_and_comment.call();
     }
 
+    function likeActionTweet(tweetId, isLike) {
+        const like_or_unlike_tweet = async () => {
+            var target_url = "like"
+            const response = await fetch(target_url, {
+                method: isLike ? "POST" : "DELETE",
+                body: JSON.stringify(
+                    {
+                        "tweetId": tweetId
+                    }
+                ),
+                headers: {
+                    "Content-type": "application/json"
+                }
+            })
+
+            if (response.ok) {
+                // This is a hack
+                // We cant use a redirect and modifying the dom here is painful
+                window.location.href = window.location.href;
+            }
+        }
+        like_or_unlike_tweet.call()
+    }
+
     window.onload = function () {
         document.getElementById('createTweetError').style.display = 'none'
         document.getElementById('tweet_submit').onclick = function (_) {
@@ -92,8 +116,14 @@
                     <small> {{tweet.time_created}} </small>
                 </div>
                 <div class="d-flex justify-content-around">
-                    <button id="buttonLike" class="btn btn-default"><img src="/static/assets/heart_icon_outline_24.png"
-                            width="24" height="24"></button>
+                    {% if tweet.id in liked_tweets %}
+                    <button id="buttonUnlike" class="btn btn-default"
+                        onclick="likeActionTweet({{tweet.id}}, false)"><img
+                            src="/static/assets/heart_icon_filled_24.png" width="24" height="24"></button>
+                    {% else %}
+                    <button id="buttonLike" class="btn btn-default" onclick="likeActionTweet({{tweet.id}}, true)"><img
+                            src="/static/assets/heart_icon_outline_24.png" width="24" height="24"></button>
+                    {% endif %}
                     <button id="buttonRetweet" class="btn btn-default" onclick="commentTweet({{tweet.id}})"><img
                             src="/static/assets/chat_icon_outline_24.png" width="24" height="24"></button>
                 </div>
