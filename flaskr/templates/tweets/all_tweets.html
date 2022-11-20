@@ -29,6 +29,26 @@
         submit_tweet_action.call();
     }
 
+    function commentTweet(tweetId) {
+        const fetch_tweet_and_comment = async () => {
+            var target_url = "get?id=" + tweetId
+            const response = await fetch(target_url, {
+                "method": "GET"
+            })
+
+            if (response.ok) {
+                let json = await response.json()
+                tweet = json['tweet']
+                user = json['user']
+                console.log(tweet)
+                document.getElementById('title').value = "Commenting on: " + tweet['title'] + " by " + user['username'] + " " + tweet['time_created']
+                document.getElementById('content').value = "\"" + tweet['content'] + "\""
+                window.scrollTo(0, 0);
+            }
+        }
+        fetch_tweet_and_comment.call();
+    }
+
     window.onload = function () {
         document.getElementById('createTweetError').style.display = 'none'
         document.getElementById('tweet_submit').onclick = function (_) {
@@ -69,6 +89,13 @@
                     </h5>
                     <h6 class="fw-bold">Title: {{tweet.title}}</h6>
                     <p> Content: {{tweet.content}} </p>
+                    <small> {{tweet.time_created}} </small>
+                </div>
+                <div class="d-flex justify-content-around">
+                    <button id="buttonLike" class="btn btn-default"><img src="/static/assets/heart_icon_outline_24.png"
+                            width="24" height="24"></button>
+                    <button id="buttonRetweet" class="btn btn-default" onclick="commentTweet({{tweet.id}})"><img
+                            src="/static/assets/chat_icon_outline_24.png" width="24" height="24"></button>
                 </div>
             </div>
         </li>
