@@ -30,8 +30,6 @@ def index():
     likedTweets = db.session.query(Like).filter(
         Like.user_id == session["user_id"]).all()
 
-    print("Liked tweets: " + str(likedTweets))
-
     for tweet in tweets:
         authors.append(db.session.query(User.username).filter(
             tweet.uid == User.id).all()[0][0])
