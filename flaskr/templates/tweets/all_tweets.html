@@ -31,7 +31,7 @@
 
     function commentTweet(tweetId) {
         const fetch_tweet_and_comment = async () => {
-            var target_url = "get?id=" + tweetId
+            var target_url = "/tweets/get?id=" + tweetId
             const response = await fetch(target_url, {
                 "method": "GET"
             })
@@ -51,7 +51,7 @@
 
     function likeActionTweet(tweetId, isLike) {
         const like_or_unlike_tweet = async () => {
-            var target_url = "like"
+            var target_url = "/tweets/like"
             const response = await fetch(target_url, {
                 method: isLike ? "POST" : "DELETE",
                 body: JSON.stringify(
