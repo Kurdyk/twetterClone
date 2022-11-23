@@ -59,15 +59,25 @@
 
     </nav>
 
-    <main class="container">
-        <header>
-            {% block header %}{% endblock %}
-        </header>
-        {% for message in get_flashed_messages() %}
-        <div class="flash">{{ message }}</div>
-        {% endfor %}
-        {% block content %}{% endblock %}
-    </main>
+    <div class="row">
+        <div class="col">
+            {% block leftColumn %}{% endblock %}
+        </div>
+        <div class="col-8 align-self-start">
+            <main class="container">
+                <header>
+                    {% block header %}{% endblock %}
+                </header>
+                {% block content %}{% endblock %}
+                {% for message in get_flashed_messages() %}
+                <div class="flash">{{ message }}</div>
+                {% endfor %}
+            </main>
+        </div>
+        <div class="col">
+            {% block rightColumn %}{% endblock %}
+        </div>
+    </div>
 
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
