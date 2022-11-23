@@ -54,47 +54,46 @@
     }
 
 </script>
-
-
-<section class="vh-20" style="background-color: #1DA1F2;">
-    <div class="container py-5 h-50">
-        <div class="d-flex  m-3 justify-content-center align-items-center h-100">
-            <div class="card d-flex flex-grow-1 " style="border-radius: 15px;">
-                <div class="card-body p-4 text-black">
-                    <div class="">
-                        <h5 class="mb-1">@{{user.username}}</h5>
-                        <div class="d-flex justify-content-start rounded-3 p-2 mb-2" style="background-color: #efefef;">
-                            <div>
-                                <p class="small text-muted mb-1">Tweets</p>
-                                <p class="mb-0">{{tweets|length}}</p>
-                            </div>
-                            <div class="px-3">
-                                <p class="small text-muted mb-1">Followers</p>
-                                <p class="mb-0">{{nb_followers}}</p>
-                            </div>
-                            <div class="px-3">
-                                <p class="small text-muted mb-1">Email</p>
-                                <p class="mb-0">{{user.email}}</p>
-                            </div>
+<div class="py-5 h-50" style="background-color: #1DA1F2;">
+    <div class="d-flex  m-3 justify-content-center align-items-center h-100">
+        <div class="card " style="border-radius: 15px;">
+            <div class="card-body p-4 text-black">
+                <div>
+                    <h5 class="mb-1">@{{user.username}}</h5>
+                    <div class="d-flex justify-content-start rounded-3 p-2 mb-2" style="background-color: #efefef;">
+                        <div>
+                            <p class="small text-muted mb-1">Tweets</p>
+                            <p class="mb-0">{{tweets|length}}</p>
                         </div>
-                        <div class="d-flex pt-1 justify-content-center">
-                            {% if own_profile : %}
-                            <button type="button" class="btn btn-danger m-1">Delete</button>
-                            {% else %}
-                            {% if already_follows : %}
-                            <button type="button" class="btn btn-primary m-1" id="followButton"
-                                style="background-color: cornflowerblue" onclick="submitFollow()">Follow
-                            </button>
-                            {% else %}
-                            <button type="button" class="btn btn-primary m-1" id="followButton"
-                                style="background-color: red" onclick="submitUnfollow()">Unfollow
-                            </button>
-                            {% endif %}
-                            {% endif %}
+                        <div class="px-3">
+                            <p class="small text-muted mb-1">Followers</p>
+                            <p class="mb-0">{{nb_followers}}</p>
+                        </div>
+                        <div class="px-3">
+                            <p class="small text-muted mb-1">Email</p>
+                            <p class="mb-0">{{user.email}}</p>
                         </div>
                     </div>
+                    <div class="d-flex pt-1 justify-content-center">
+                        {% if own_profile : %}
+                        <button type="button" class="btn btn-danger m-1">Delete</button>
+                        {% else %}
+                        {% if already_follows : %}
+                        <button type="button" class="btn btn-primary m-1" id="followButton"
+                            style="background-color: cornflowerblue" onclick="submitFollow()">Follow
+                        </button>
+                        {% else %}
+                        <button type="button" class="btn btn-primary m-1" id="followButton"
+                            style="background-color: red" onclick="submitUnfollow()">Unfollow
+                        </button>
+                        {% endif %}
+                        {% endif %}
+                    </div>
                 </div>
-</section>
+            </div>
+        </div>
+    </div>
+</div>
 
 <ul class="list-group mt-3">
     <h5>Tweets</h5>
@@ -150,7 +149,4 @@
     {% endfor %}
     {% endif %}
 </ul>
-
-</div>
-</div>
 {% endblock %}
