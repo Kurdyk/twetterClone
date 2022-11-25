@@ -1,6 +1,7 @@
-
+import os
+import openai
 from flask import (
-    Blueprint, g, jsonify, render_template, session, request, redirect, url_for
+    Blueprint, current_app, g, jsonify, render_template, session, request, redirect, url_for
 )
 from flaskr.auth import login_required
 
@@ -90,14 +91,46 @@ def add_new_tweet():
     title = request.form["title"]
     # We need to sanitize the input
     content = request.form["content"]
-    db = get_db()
 
+    return postTweet(Tweet(
+        uid=user_id,
+        title=title,
+        content=content,
+    ))
+
+
+@bp.route("/new_tweet/generate", methods=["POST"])
+@login_required
+def generateTweet():
+    user_id = session["user_id"]
+    title = request.form["title"]
+    content = request.form["content"]
+
+    with open(os.path.join(current_app.instance_path, 'secrets.txt')) as f:
+        api_key = f.read()
+
+    openai.api_key = api_key
+    response = openai.Completion.create(
+        model="text-davinci-002",
+        # Change this to change what the prompt does
+        prompt="Rewrite this in the style of William Shakespeare:\n\n"+content,
+        temperature=0,
+        max_tokens=60,
+        top_p=1.0,
+        frequency_penalty=0.0,
+        presence_penalty=0.0
+    )
+
+    return postTweet(Tweet(
+        uid=user_id,
+        title=title,
+        content=response['choices'][0]['text'],
+    ))
+
+
+def postTweet(new_tweet):
+    db = get_db()
     try:
-        new_tweet = Tweet(
-            uid=user_id,
-            title=title,
-            content=content,
-        )
         db.session.add(new_tweet)
         db.session.commit()
     except db.IntegrityError:
