@@ -1,12 +1,24 @@
 {% extends 'base.html' %}
 
 {% block header %}
+window.onload()
 <h2>{% block title %}Profile of {{user.username}}{% endblock %}</h2>
 {% endblock %}
 
 {% block content %}
 
 <script>
+
+    window.onload = function(){
+    document.getElementById("left_column").style.backgroundColor = "lightgray";
+    document.getElementById("right_column").style.backgroundColor = "lightgray";
+}
+
+</script>
+
+<script>
+
+
 
     function submitFollow() {
         const submit_follow_action = async () => {
@@ -109,44 +121,76 @@
     </li>
     {% endfor %}
 </ul>
-<ul class="list-group m-1">
-    <h5>Followers</h5>
-    {% if followers|length == 0 %}
-    <li class="list-group-item">
-        <div class="flex-column">
-            None yet!
-        </div>
-    </li>
-    {% else %}
-    {% for user in followers: %}
-    <li class="list-group-item">
-        <div class="flex-column">
-            <div>
-                <a style="color: black;" href="/users/search/{{user.username}}">@{{user.username}}</a>
-            </div>
-        </div>
-    </li>
-    {% endfor %}
-    {% endif %}
-</ul>
-<ul class="list-group m-1">
-    <h5>Followed users</h5>
-    {% if followed|length == 0 %}
-    <li class="list-group-item">
-        <div class="flex-column">
-            None yet!
-        </div>
-    </li>
-    {% else %}
-    {% for user in followed: %}
-    <li class="list-group-item">
-        <div class="flex-column">
-            <div>
-                <a style="color: black;" href="/users/search/{{user.username}}">@{{user.username}}</a>
-            </div>
-        </div>
-    </li>
-    {% endfor %}
-    {% endif %}
-</ul>
+
 {% endblock %}
+
+{% block leftColumn %}
+    <ul class="list-group m-1">
+        <h5>Followers</h5>
+        {% if followers|length == 0 %}
+        <li class="list-group-item">
+            <div class="flex-column">
+                None yet!
+            </div>
+        </li>
+        {% else %}
+        {% for user in followers: %}
+        <li class="list-group-item">
+            <div class="flex-column">
+                <div>
+                    <a style="color: black;" href="/users/search/{{user.username}}">@{{user.username}}</a>
+                </div>
+            </div>
+        </li>
+        {% endfor %}
+        {% endif %}
+
+    </ul>
+{% endblock %}
+
+{% block rightColumn %}
+    <ul class="list-group m-1" id="test">
+        <h5>Followed users</h5>
+        {% if followed|length == 0 %}
+        <li class="list-group-item">
+            <div class="flex-column">
+                None yet!
+            </div>
+        </li>
+        {% else %}
+        {% for user in followed: %}
+        <li class="list-group-item">
+            <div class="flex-column">
+                <div>
+                    <a style="color: black;" href="/users/search/{{user.username}}">@{{user.username}}</a>
+                </div>
+            </div>
+        </li>
+        {% endfor %}
+        {% endif %}
+    </ul>
+
+    <ul class="list-group m-1">
+        {% if own_profile %}
+            <h5>User recommandantation<br>You don't want to miss out:</h5>
+            {% if recommandation|length == 0 %}
+            <li class="list-group-item">
+                <div class="flex-column">
+                    No recommandation for you.
+                </div>
+            </li>
+            {% else %}
+            {% for user in recommandation: %}
+            <li class="list-group-item">
+                <div class="flex-column">
+                    <div>
+                        <a style="color: black;" href="/users/search/{{user.username}}">@{{user.username}}</a>
+                    </div>
+                </div>
+            </li>
+            {% endfor %}
+            {% endif %}
+        {% endif %}
+    </ul>
+{% endblock %}
+

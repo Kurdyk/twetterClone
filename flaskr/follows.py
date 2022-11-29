@@ -108,22 +108,33 @@ class FollowGraph:
         except KeyError:
             print("Unknown user")
 
-    def recommandation(self, source_user: User, max_depth: int):
-        if source_user.id not in self.edges:
+    def recommandation(self, source_user_id: int, max_depth: int):
+        if source_user_id not in self.edges:
             print("not following anyone, random suggestions")
-            return random.sample(self.edges, min(max_depth, len(self.edges)))
+            return random.sample(self.edges.keys(), min(max_depth, len(self.edges)))
         result = set()
+        id_set = set()
         explored_set = set()
-        frontier = [source_user.id]
+        frontier = [source_user_id]
         current_depth = 0
+        print(frontier)
         while len(frontier) > 0 and current_depth <= max_depth:
-            current_id = frontier[0]
+            current_id = frontier.pop(0)
             explored_set.add(current_id)
-            for neighboor_id in self.edges[current_id]:
-                frontier.append(neighboor_id)
-                if neighboor_id not in self.edges[source_user.id]:
-                    result.add(neighboor_id)
+            try:
+                for neighboor_id in self.edges[current_id]:
+                    if neighboor_id not in explored_set:
+                        frontier.append(neighboor_id)
+                    if neighboor_id not in self.edges[source_user_id]:
+                        id_set.add(neighboor_id)
+            except KeyError:  # no follow on current_id
+                pass
             current_depth += 1
+        # recover actual users
+        db = get_db()
+        print(id_set)
+        for user_id in id_set:
+            result.add(db.session.query(User).filter(User.id == user_id).first())
         return result
 
     def print(self):
