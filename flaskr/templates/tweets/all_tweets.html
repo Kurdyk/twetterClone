@@ -6,18 +6,26 @@
 
 {% block content %}
 <script>
+
+    function collectFormData() {
+        document.getElementById('createTweetError').style.display = 'none'
+        let form_data = new FormData(document.getElementById('createTweetForm'));
+
+        if (form_data.get('title') == "" || form_data.get('content') == "") {
+            document.getElementById('createTweetError').style.display = 'block'
+            return null
+        }
+        return form_data
+    }
+
     function submitTweet() {
         const submit_tweet_action = async () => {
-            document.getElementById('createTweetError').style.display = 'none'
-            let form_data = new FormData(document.getElementById('createTweetForm'));
-
-            var target_url = "/tweets/new_tweet";
-
-            if (form_data.get('title') == "" || form_data.get('content') == "") {
-                document.getElementById('createTweetError').style.display = 'block'
+            form_data = collectFormData()
+            if (form_data == null) {
                 return
             }
 
+            var target_url = "/tweets/new_tweet";
             const request = await fetch(target_url, {
                 "method": "POST",
                 "body": form_data
@@ -27,6 +35,32 @@
             }
         };
         submit_tweet_action.call();
+    }
+
+    function generateTweet() {
+        showGenerateLoading(true)
+        const generate_tweet_action = async () => {
+            form_data = collectFormData()
+            if (form_data == null) {
+                return
+            }
+            var target_url = "/tweets/new_tweet/generate";
+            const request = await fetch(target_url, {
+                "method": "POST",
+                "body": form_data
+            });
+            if (request.redirected) {
+                window.location = request.url;
+            }
+
+        };
+        generate_tweet_action.call();
+    }
+
+    function showGenerateLoading(show) {
+        document.getElementById('generateText').style.display = show ? "none" : "block"
+        document.getElementById('generateLoading').style.display = !show ? "none" : "block"
+        document.getElementById('generateLoadingText').style.display = !show ? "none" : "block"
     }
 
     function commentTweet(tweetId) {
@@ -74,9 +108,13 @@
     }
 
     window.onload = function () {
+        showGenerateLoading(false)
         document.getElementById('createTweetError').style.display = 'none'
         document.getElementById('tweet_submit').onclick = function (_) {
             submitTweet()
+        }
+        document.getElementById('tweet_generate').onclick = function (_) {
+            generateTweet()
         }
     }
 </script>
@@ -91,12 +129,26 @@
             <label for="content">Tell us what you think</label>
             <textarea class="form-control" id="content" name="content" rows="4" required></textarea>
         </div>
-        <p id="createTweetError" class="text-danger">
+        <p id="createTweetError" class="text-danger" hidden>
             Oops! Missing a required field
         </p>
         <small id="under_text" class="form-text text-muted">Always happy to see you.</small>
-        <div class="text-right">
-            <button type="button" class="btn btn-primary" id="tweet_submit">Submit Tweet</button>
+        <div class="row mt-1">
+            <div class="col">
+                <div class="text-right">
+                    <button type="button" class="btn btn-primary" id="tweet_submit">Submit Tweet</button>
+                </div>
+            </div>
+            <div class="col">
+                <div class="text-right">
+                    <button type="button" class="btn btn-primary" id="tweet_generate">
+                        <span id="generateText">Submit but smarter</span>
+                        <span id="generateLoading" class="spinner-grow spinner-grow-sm" role="status"
+                            aria-hidden="true"></span>
+                        <span id="generateLoadingText" class="sr-only">Loading...</span>
+                    </button>
+                </div>
+            </div>
         </div>
     </form>
 </div>
