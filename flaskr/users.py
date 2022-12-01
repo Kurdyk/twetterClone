@@ -53,7 +53,6 @@ def search_for_email(username):
     already_follows = is_following(username)
     followers = get_followers(username)
     followed = get_followed(username)
-    follow_graph.print()
     recommandation = follow_graph.recommandation(session["user_id"], 5)
     return render_template('users/profile.html', user=user, tweets=tweets,
                            own_profile=own_profile, already_follows=already_follows,
