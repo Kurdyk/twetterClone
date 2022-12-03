@@ -90,7 +90,7 @@ class FollowGraph:
             for key in self.edges:
                 self.edges[key].remove(user_id)
         except KeyError:
-            print("Unknown user")
+            pass
 
     def add_follow(self, follower_id: int, followed_id: int):
         try:

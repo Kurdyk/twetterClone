@@ -84,6 +84,22 @@
         delete_action.call(id)
     }
 
+    function deleteProfile(id) {
+        const delete_action = async () => {
+            var target_url = "/users/delete"
+            const request = await fetch(target_url, {
+                method: "DELETE",
+                body: id
+            })
+
+            if (request.redirected) {
+                window.location = request.url;
+            }
+        }
+
+        delete_action.call()
+    }
+
 </script>
 
 
@@ -109,7 +125,7 @@
                     </div>
                     <div class="d-flex pt-1 justify-content-center">
                         {% if own_profile : %}
-                        <button type="button" class="btn btn-danger m-1">Delete</button>
+                        <button type="button" class="btn btn-danger m-1" onclick="deleteProfile({{user.id}})">Delete</button>
                         {% else %}
                         {% if already_follows : %}
                         <button type="button" class="btn btn-primary m-1" id="followButton"
