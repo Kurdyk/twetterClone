@@ -84,6 +84,15 @@ def update_index(tweet: Tweet):
     return None
 
 
+def delete_from_index(tweet_id : int):
+    for word in tweet_index:
+        try:
+            tweet_index[word].remove(tweet_id)
+        except KeyError:
+            pass
+    return
+
+
 @bp.route("/new_tweet", methods=["POST"])
 @login_required
 def add_new_tweet():
@@ -97,6 +106,22 @@ def add_new_tweet():
         title=title,
         content=content,
     ))
+
+
+@bp.route("/delete", methods=["DELETE"])
+@login_required
+def delete_tweet():
+    tweet_id = int(request.data)
+    db = get_db()
+    try:  # find and delete the tweet from the DB
+        tweet = db.session.query(Tweet).filter(Tweet.id == tweet_id).first()
+        db.session.delete(tweet)
+        db.session.commit()
+    except Exception:
+        return "error while trying to delete tweet", 402
+    else:   # delete in DB is success: removing from index
+        delete_from_index(tweet_id)
+    return "Success", 200
 
 
 @bp.route("/new_tweet/generate", methods=["POST"])
