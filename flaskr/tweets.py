@@ -1,8 +1,11 @@
+import itertools
 import os
+import string
 import openai
 from flask import (
     Blueprint, current_app, g, jsonify, render_template, session, request, redirect, url_for
 )
+from spellchecker import SpellChecker
 from flaskr.auth import login_required
 
 from flaskr.db import Like, Tweet, get_db, User
@@ -10,6 +13,7 @@ from flaskr.db import Like, Tweet, get_db, User
 bp = Blueprint('tweets', __name__, url_prefix='/tweets')
 
 tweet_index = dict()  # used to store word -> tweet relationship
+spellchecker = SpellChecker()
 
 
 @bp.route("/all", methods=["GET"])
@@ -39,7 +43,7 @@ def index():
 
     for like in likedTweets:
         likes[like.tweet_id] = like
-    return render_template('tweets/all_tweets.html', tweets_authors=map_tweets_to_authors(tweets), liked_tweets=likes)
+    return render_template('tweets/all_tweets.html', tweets_authors=map_tweets_to_authors(tweets), liked_tweets=likes, is_search=False)
 
 
 @bp.route("/search_word", methods=["GET"])
@@ -48,6 +52,7 @@ def search_for_word():
     tweets = list()
     # Do we need to sanitize the input?
     word = request.args.get('search').lower()  # the index is in lower case
+    word = word.translate(str.maketrans('', '', string.punctuation))
     try:
         all_ids = tweet_index[word]
     except KeyError:
@@ -58,7 +63,14 @@ def search_for_word():
         tweets += db.session.query(Tweet).order_by(Tweet.id.desc()
                                                    ).filter(Tweet.id == tweet_id).all()
 
-    return render_template('tweets/all_tweets.html', tweets_authors=map_tweets_to_authors(tweets))
+    likedTweets = db.session.query(Like).filter(
+        Like.user_id == session["user_id"]).all()
+
+    likes = dict()
+    for like in likedTweets:
+        likes[like.tweet_id] = like
+
+    return render_template('tweets/all_tweets.html', tweets_authors=map_tweets_to_authors(tweets), liked_tweets=likes, is_search=True)
 
 
 def init_index():
@@ -73,17 +85,25 @@ def init_index():
 
 def update_index(tweet: Tweet):
     content = tweet.content + " " + tweet.title
-    for word in content.split(" "):
-        if word.isalnum():  # so we can search for number too if we want
-            word = word.lower()
-            try:
-                tweet_index[word].add(tweet.id)
-            except KeyError:
-                tweet_index[word] = {tweet.id}
+    for word in content.split():
+        word = word.lower()
+        word = word.translate(str.maketrans('', '', string.punctuation))
+        try:
+            tweet_index[word].add(tweet.id)
+        except KeyError:
+            tweet_index[word] = {tweet.id}
+
+        checked = spellchecker.candidates(word)
+        if (checked):
+            for candidate in checked:
+                try:
+                    tweet_index[candidate].add(tweet.id)
+                except KeyError:
+                    tweet_index[candidate] = {tweet.id}
     return None
 
 
-def delete_from_index(tweet_id : int):
+def delete_from_index(tweet_id: int):
     for word in tweet_index:
         try:
             tweet_index[word].remove(tweet_id)
@@ -92,8 +112,8 @@ def delete_from_index(tweet_id : int):
     return
 
 
-@bp.route("/new_tweet", methods=["POST"])
-@login_required
+@ bp.route("/new_tweet", methods=["POST"])
+@ login_required
 def add_new_tweet():
     user_id = session["user_id"]
     title = request.form["title"]
@@ -107,8 +127,8 @@ def add_new_tweet():
     ))
 
 
-@bp.route("/delete", methods=["DELETE"])
-@login_required
+@ bp.route("/delete", methods=["DELETE"])
+@ login_required
 def delete_tweet():
     tweet_id = int(request.data)
     db = get_db()
@@ -123,8 +143,8 @@ def delete_tweet():
     return "Success", 200
 
 
-@bp.route("/new_tweet/generate", methods=["POST"])
-@login_required
+@ bp.route("/new_tweet/generate", methods=["POST"])
+@ login_required
 def generateTweet():
     user_id = session["user_id"]
     title = request.form["title"]
