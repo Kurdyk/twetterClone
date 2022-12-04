@@ -2,7 +2,7 @@ import functools
 import os
 
 from flask import (
-    Blueprint, current_app, flash, g, jsonify, redirect, request, render_template, session, url_for
+    Blueprint, current_app, flash, g, jsonify, redirect, request, render_template, send_from_directory, session, url_for
 )
 from sqlalchemy import update
 
@@ -103,6 +103,14 @@ def upload_avatar():
                     avatar=newfilename)
                 db.session.execute(stmt)
                 db.session.commit()
-            except Exception:
+                user = db.session.query(User).where(
+                    User.id == session['user_id']).first()
+                update_user_index(user)
+                return 'Success', 200
+            except Exception as e:
                 return 'Error adding avatar to user', 500
-            return 'Success', 200
+
+
+@bp.route('/avatar/<path:path>')
+def get_user_avatar(path):
+    return send_from_directory(current_app.config['UPLOAD_FOLDER'], path)
