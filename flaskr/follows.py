@@ -120,7 +120,7 @@ class FollowGraph:
             explored_set.add(current_id)
             try:
                 for neighboor_id in self.edges[current_id]:
-                    if neighboor_id not in explored_set:
+                    if neighboor_id not in explored_set and neighboor_id not in frontier:
                         frontier.append(neighboor_id)
                     if neighboor_id not in self.edges[source_user_id]:
                         id_set.add(neighboor_id)

@@ -13,3 +13,9 @@ Something like
 
 # Adding a random tweet
 `flask --app flaskr add-random-tweet`
+
+# Getting symetric relationships
+flask --app flaskr symetric-relationship [--name]
+
+# Getting the followers at each level < depth
+flask --app flaskr followers-graph <--user_id n> [--depth <depth>]
