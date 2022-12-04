@@ -43,7 +43,7 @@ def index():
 
     for like in likedTweets:
         likes[like.tweet_id] = like
-    return render_template('tweets/all_tweets.html', tweets_authors=map_tweets_to_authors(tweets), liked_tweets=likes)
+    return render_template('tweets/all_tweets.html', tweets_authors=map_tweets_to_authors(tweets), liked_tweets=likes, is_search=False)
 
 
 @bp.route("/search_word", methods=["GET"])
@@ -63,7 +63,14 @@ def search_for_word():
         tweets += db.session.query(Tweet).order_by(Tweet.id.desc()
                                                    ).filter(Tweet.id == tweet_id).all()
 
-    return render_template('tweets/all_tweets.html', tweets_authors=map_tweets_to_authors(tweets))
+    likedTweets = db.session.query(Like).filter(
+        Like.user_id == session["user_id"]).all()
+
+    likes = dict()
+    for like in likedTweets:
+        likes[like.tweet_id] = like
+
+    return render_template('tweets/all_tweets.html', tweets_authors=map_tweets_to_authors(tweets), liked_tweets=likes, is_search=True)
 
 
 def init_index():
