@@ -1,14 +1,17 @@
 import functools
 import os
 
+import sqlalchemy.orm.exc
 from flask import (
-    Blueprint, current_app, flash, g, jsonify, redirect, request, render_template, send_from_directory, session, url_for
+    Blueprint, current_app, flash, g, jsonify, redirect, request, render_template, send_from_directory, session, redirect, url_for, url_for
 )
+from sqlalchemy import or_
 from sqlalchemy import update
 
-from flaskr.db import User, get_db, Tweet
+from flaskr.db import User, get_db, Tweet, Follow, Like
 from flaskr.auth import login_required
 from flaskr.follows import is_following, get_followed, get_followers, follow_graph
+from flaskr.tweets import delete_from_index
 from werkzeug.utils import secure_filename
 
 
@@ -57,13 +60,46 @@ def search_for_email(username):
     already_follows = is_following(username)
     followers = get_followers(username)
     followed = get_followed(username)
-    follow_graph.print()
     recommandation = follow_graph.recommandation(session["user_id"], 5)
     return render_template('users/profile.html', user=user, tweets=tweets,
                            own_profile=own_profile, already_follows=already_follows,
                            followed=followed, followers=followers, nb_followers=len(
                                followers),
                            recommandation=recommandation)
+
+
+@bp.route("/delete", methods=["DELETE"])
+@login_required
+def delete_user():
+    user_id = int(request.data)
+    db = get_db()
+    try:
+        user = db.session.query(User).filter(User.id == user_id).first()
+        likes = db.session.query(Like).filter(
+            Like.user_id == user_id).all()    # user likes
+        for like in likes:
+            db.session.delete(like)
+        tweets = db.session.query(Tweet).filter(Tweet.uid == user_id).all()
+        for tweet in tweets:
+            likes_on_tweet = db.session.query(Like).filter(
+                Like.tweet_id == tweet.id).all()     # likes received
+            for like in likes_on_tweet:
+                db.session.delete(like)
+            db.session.delete(tweet)
+        follows = db.session.query(Follow).filter(
+            or_(Follow.follower_id == user_id, Follow.followed_id == user_id)).all()
+        for follow in follows:
+            db.session.delete(follow)
+        db.session.delete(user)
+        db.session.commit()
+    except Exception as e:
+        print(e)
+        return "Error while deleting user", 402
+
+    follow_graph.delete_user(user_id)  # delete from follow graph
+    for tweet in tweets:  # delete his tweets from index
+        delete_from_index(tweet.id)
+    return redirect(url_for("tweets.index"))
 
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}

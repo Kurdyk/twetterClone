@@ -29,7 +29,6 @@ def follow(username):
             return "error while trying to follow", 402
         else:
             follow_graph.add_follow(current_id, target_id)
-            follow_graph.print()
             return "Success", 200
     else:   # request.method == "DELETE"
         try:
@@ -42,7 +41,6 @@ def follow(username):
             return "error while trying to unfollow", 402
         else:
             follow_graph.remove_follow(current_id, target_id)
-            follow_graph.print()
 
             return "Success", 200
 
@@ -92,7 +90,7 @@ class FollowGraph:
             for key in self.edges:
                 self.edges[key].remove(user_id)
         except KeyError:
-            print("Unknown user")
+            pass
 
     def add_follow(self, follower_id: int, followed_id: int):
         try:
@@ -117,13 +115,12 @@ class FollowGraph:
         explored_set = set()
         frontier = [source_user_id]
         current_depth = 0
-        print(frontier)
         while len(frontier) > 0 and current_depth <= max_depth:
             current_id = frontier.pop(0)
             explored_set.add(current_id)
             try:
                 for neighboor_id in self.edges[current_id]:
-                    if neighboor_id not in explored_set:
+                    if neighboor_id not in explored_set and neighboor_id not in frontier:
                         frontier.append(neighboor_id)
                     if neighboor_id not in self.edges[source_user_id]:
                         id_set.add(neighboor_id)
@@ -132,7 +129,6 @@ class FollowGraph:
             current_depth += 1
         # recover actual users
         db = get_db()
-        print(id_set)
         for user_id in id_set:
             result.add(db.session.query(User).filter(User.id == user_id).first())
         return result

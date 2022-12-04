@@ -1,7 +1,5 @@
 {% extends 'base.html' %}
 
-window.onload()
-
 {% block header %}
 <h2>{% block title %}Profile of {{user.username}}{% endblock %}</h2>
 {% endblock %}
@@ -18,8 +16,6 @@ window.onload()
 </script>
 
 <script>
-
-
 
     function submitFollow() {
         const submit_follow_action = async () => {
@@ -66,6 +62,44 @@ window.onload()
         submit_unfollow_action.call();
     }
 
+    function deleteTweet(id) {
+        const delete_action = async () => {
+            var target_url = '/tweets/delete'
+            const request = await fetch(target_url, {
+                "method": "DELETE",
+                "body": id,
+            });
+            if (request.status !== 200) {
+                return
+            }
+
+            <!-- Modifiying display -->
+            var to_remove = document.getElementById(id)
+            to_remove.parentNode.removeChild(to_remove)
+
+            var old_count = parseInt(document.getElementById("tweet_count").innerText)
+            document.getElementById("tweet_count").innerText = (old_count - 1).toString()
+
+        }
+        delete_action.call(id)
+    }
+
+    function deleteProfile(id) {
+        const delete_action = async () => {
+            var target_url = "/users/delete"
+            const request = await fetch(target_url, {
+                method: "DELETE",
+                body: id
+            })
+
+            if (request.redirected) {
+                window.location = request.url;
+            }
+        }
+
+        delete_action.call()
+    }
+
     function submitAvatar() {
         const submit_avatar_action = async () => {
             var target_url = '/users/avatar/upload'
@@ -101,6 +135,8 @@ window.onload()
     }
 
 </script>
+
+
 <div class="py-5 h-50" style="background-color: #1DA1F2;">
     <div class="d-flex  m-3 justify-content-center align-items-center h-100">
         <div class="card " style="border-radius: 15px;">
@@ -121,7 +157,7 @@ window.onload()
                     <div class="d-flex justify-content-start rounded-3 p-2 mb-2" style="background-color: #efefef;">
                         <div>
                             <p class="small text-muted mb-1">Tweets</p>
-                            <p class="mb-0">{{tweets|length}}</p>
+                            <p class="mb-0" id="tweet_count">{{tweets|length}}</p>
                         </div>
                         <div class="px-3">
                             <p class="small text-muted mb-1">Followers</p>
@@ -150,7 +186,8 @@ window.onload()
                                         disabled>Submit</button>
                                 </form>
                             </div>
-                            <button type="button" class="btn btn-danger">Delete Account</button>
+                            <button type="button" class="btn btn-danger" onclick="deleteProfile({{user.id}})">Delete
+                                Account</button>
                         </div>
                         {% else %}
                         {% if already_follows : %}
@@ -179,6 +216,11 @@ window.onload()
                 <h5 class="fs-1"> Author: @{{user.username}}</h5>
                 <h6 class="fw-bold">Title: {{tweet.title}}</h6>
                 <p> Content: {{tweet.content}} </p>
+                {% if own_profile : %}
+                <button type="button" class="btn btn-danger m-1 float-right" id="deleteTweet"
+                    onclick="deleteTweet({{tweet.id}})">Delete
+                </button>
+                {% endif %}
             </div>
         </div>
     </li>

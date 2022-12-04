@@ -5,6 +5,8 @@ from select import select
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import func, select
+from sqlalchemy.orm import relationship, backref
+from flaskr.final_questions import symetric_relation, get_followers_with_depth
 
 db = SQLAlchemy()
 
@@ -15,6 +17,8 @@ def init_app(app):
         db.create_all()
         app.cli.add_command(add_random_user)
         app.cli.add_command(add_random_tweet)
+        app.cli.add_command(symetric_relation)
+        app.cli.add_command(get_followers_with_depth)
 
 
 def get_db():
@@ -60,6 +64,9 @@ class User(db.Model):
     password = db.Column(db.String(24), nullable=False)
     avatar = db.Column(db.String(50), nullable=True)
 
+    # user_to_tweet_relationship = relationship("Tweet", cascade="all,delete,delete-orphan", backref="User")
+    # user_to_like_relationship = relationship("Like", cascade="all,delete,delete-orphan", backref="User")
+
     @property
     def serialize(self):
         return {
@@ -79,6 +86,8 @@ class Tweet(db.Model):
     content = db.Column(db.String(2048), nullable=False)
     time_created = db.Column(db.DateTime(
         timezone=True), server_default=func.now())
+
+    # tweet_to_like_relationship = relationship("Like", cascade="all,delete", backref="tweet")
 
     @property
     def serialize(self):
