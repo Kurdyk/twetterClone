@@ -6,6 +6,7 @@ from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import func, select
 from sqlalchemy.orm import relationship, backref
+from flaskr.final_questions import symetric_relation, get_followers_with_depth
 
 db = SQLAlchemy()
 
@@ -16,6 +17,8 @@ def init_app(app):
         db.create_all()
         app.cli.add_command(add_random_user)
         app.cli.add_command(add_random_tweet)
+        app.cli.add_command(symetric_relation)
+        app.cli.add_command(get_followers_with_depth)
 
 
 def get_db():
@@ -63,7 +66,6 @@ class User(db.Model):
     # user_to_tweet_relationship = relationship("Tweet", cascade="all,delete,delete-orphan", backref="User")
     # user_to_like_relationship = relationship("Like", cascade="all,delete,delete-orphan", backref="User")
 
-
     @property
     def serialize(self):
         return {
@@ -85,7 +87,6 @@ class Tweet(db.Model):
 
     # tweet_to_like_relationship = relationship("Like", cascade="all,delete", backref="tweet")
 
-
     @property
     def serialize(self):
         return {
@@ -99,8 +100,10 @@ class Tweet(db.Model):
 
 class Follow(db.Model):
     __tablename__ = "follows"
-    follower_id = db.Column(db.Integer, db.ForeignKey("user.id"), primary_key=True, nullable=False)
-    followed_id = db.Column(db.Integer, db.ForeignKey("user.id"), primary_key=True, nullable=False)
+    follower_id = db.Column(db.Integer, db.ForeignKey(
+        "user.id"), primary_key=True, nullable=False)
+    followed_id = db.Column(db.Integer, db.ForeignKey(
+        "user.id"), primary_key=True, nullable=False)
 
     # follower_to_user_relationship = relationship("User",
     #                                              cascade="all,delete",
