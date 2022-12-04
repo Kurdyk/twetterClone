@@ -62,6 +62,7 @@ class User(db.Model):
     # needed for login so unique is a good idea
     email = db.Column(db.String(50), nullable=False, unique=True)
     password = db.Column(db.String(24), nullable=False)
+    avatar = db.Column(db.String(50), nullable=True)
 
     # user_to_tweet_relationship = relationship("Tweet", cascade="all,delete,delete-orphan", backref="User")
     # user_to_like_relationship = relationship("Like", cascade="all,delete,delete-orphan", backref="User")
@@ -72,7 +73,8 @@ class User(db.Model):
             'id': self.id,
             'username': self.username,
             'email': self.email,
-            'password': self.password
+            'password': self.password,
+            'avatar': self.avatar
         }
 
 
@@ -104,16 +106,6 @@ class Follow(db.Model):
         "user.id"), primary_key=True, nullable=False)
     followed_id = db.Column(db.Integer, db.ForeignKey(
         "user.id"), primary_key=True, nullable=False)
-
-    # follower_to_user_relationship = relationship("User",
-    #                                              cascade="all,delete",
-    #                                              backref="Follower",
-    #                                              foreign_keys=follower_id)
-    #
-    # followed_to_user_relationship = relationship("User",
-    #                                              cascade="all,delete",
-    #                                              backref="Followed",
-    #                                              foreign_keys=followed_id)
 
     @property
     def serialize(self):

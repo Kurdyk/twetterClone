@@ -8,10 +8,10 @@
 
 <script>
 
-    window.onload = function(){
-    document.getElementById("left_column").style.backgroundColor = "lightgray";
-    document.getElementById("right_column").style.backgroundColor = "lightgray";
-}
+    window.onload = function () {
+        document.getElementById("left_column").style.backgroundColor = "lightgray";
+        document.getElementById("right_column").style.backgroundColor = "lightgray";
+    }
 
 </script>
 
@@ -67,7 +67,7 @@
             var target_url = '/tweets/delete'
             const request = await fetch(target_url, {
                 "method": "DELETE",
-                "body" : id,
+                "body": id,
             });
             if (request.status !== 200) {
                 return
@@ -100,6 +100,40 @@
         delete_action.call()
     }
 
+    function submitAvatar() {
+        const submit_avatar_action = async () => {
+            var target_url = '/users/avatar/upload'
+            var file = document.getElementById('formFile').files[0]
+            const xhr = new XMLHttpRequest();
+            const fd = new FormData();
+
+            xhr.open("POST", target_url, true);
+            xhr.setRequestHeader("enctype", "multipart/form-data")
+            xhr.onreadystatechange = () => {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    document.getElementById('formFile').value = ''
+                    document.getElementById('avatarSubmit').disabled = true
+                    window.location.reload()
+                }
+            };
+            fd.append(file['name'], file);
+            fd.append('filename', file['name'])
+            xhr.send(fd);
+        };
+        submit_avatar_action.call()
+    }
+
+    window.onload = function () {
+        document.getElementById('formFile').onchange = function () {
+            var input = this.files[0]
+            if (input) {
+                document.getElementById('avatarSubmit').disabled = false
+            } else {
+                document.getElementById('avatarSubmit').disabled = true
+            }
+        }
+    }
+
 </script>
 
 
@@ -108,7 +142,18 @@
         <div class="card " style="border-radius: 15px;">
             <div class="card-body p-4 text-black">
                 <div>
-                    <h5 class="mb-1">@{{user.username}}</h5>
+                    <div class="row ml-1 mb-2">
+                        {% if own_profile == false%}
+                        {% if user.avatar %}
+                        <img src="{{url_for('users.get_user_avatar',path=user.avatar) }}" width="56" height="56"
+                            class="rounded-circle" alt="Avatar">
+                        {% else %}
+                        <img src="/static/assets/avatar_icon.png" width="56" height="56" class="rounded-circle"
+                            alt="Avatar">
+                        {% endif %}
+                        {% endif %}
+                        <h5 class="mb-1 ml-1 align-self-center">@{{user.username}}</h5>
+                    </div>
                     <div class="d-flex justify-content-start rounded-3 p-2 mb-2" style="background-color: #efefef;">
                         <div>
                             <p class="small text-muted mb-1">Tweets</p>
@@ -125,7 +170,25 @@
                     </div>
                     <div class="d-flex pt-1 justify-content-center">
                         {% if own_profile : %}
-                        <button type="button" class="btn btn-danger m-1" onclick="deleteProfile({{user.id}})">Delete</button>
+                        <div class="col">
+                            <div class="row">
+                                {% if user.avatar %}
+                                <img src="{{url_for('users.get_user_avatar',path=user.avatar) }}" width="56" height="56"
+                                    class="rounded-circle" alt="Avatar">
+                                {% else %}
+                                <img src="/static/assets/avatar_icon.png" width="56" height="56" class="rounded-circle"
+                                    alt="Avatar">
+                                {% endif %}
+                                <form class="mb-3 ml-3" id="fileUploadForm" action="#" onsubmit="">
+                                    <label for="formFile" class="form-label">Change your users avatar</label>
+                                    <input class="form-control" type="file" id="formFile">
+                                    <button class="btn btn-primary mt-1" id="avatarSubmit" onclick="submitAvatar()"
+                                        disabled>Submit</button>
+                                </form>
+                            </div>
+                            <button type="button" class="btn btn-danger" onclick="deleteProfile({{user.id}})">Delete
+                                Account</button>
+                        </div>
                         {% else %}
                         {% if already_follows : %}
                         <button type="button" class="btn btn-primary m-1" id="followButton"
@@ -154,8 +217,9 @@
                 <h6 class="fw-bold">Title: {{tweet.title}}</h6>
                 <p> Content: {{tweet.content}} </p>
                 {% if own_profile : %}
-                    <button type="button" class="btn btn-danger m-1 float-right" id="deleteTweet" onclick="deleteTweet({{tweet.id}})">Delete
-                    </button>
+                <button type="button" class="btn btn-danger m-1 float-right" id="deleteTweet"
+                    onclick="deleteTweet({{tweet.id}})">Delete
+                </button>
                 {% endif %}
             </div>
         </div>
@@ -166,72 +230,71 @@
 {% endblock %}
 
 {% block leftColumn %}
-    <ul class="list-group m-1">
-        <h5>Followers</h5>
-        {% if followers|length == 0 %}
-        <li class="list-group-item">
-            <div class="flex-column">
-                None yet!
+<ul class="list-group m-1">
+    <h5>Followers</h5>
+    {% if followers|length == 0 %}
+    <li class="list-group-item">
+        <div class="flex-column">
+            None yet!
+        </div>
+    </li>
+    {% else %}
+    {% for user in followers: %}
+    <li class="list-group-item">
+        <div class="flex-column">
+            <div>
+                <a style="color: black;" href="/users/search/{{user.username}}">@{{user.username}}</a>
             </div>
-        </li>
-        {% else %}
-        {% for user in followers: %}
-        <li class="list-group-item">
-            <div class="flex-column">
-                <div>
-                    <a style="color: black;" href="/users/search/{{user.username}}">@{{user.username}}</a>
-                </div>
-            </div>
-        </li>
-        {% endfor %}
-        {% endif %}
+        </div>
+    </li>
+    {% endfor %}
+    {% endif %}
 
-    </ul>
+</ul>
 {% endblock %}
 
 {% block rightColumn %}
-    <ul class="list-group m-1" id="test">
-        <h5>Followed users</h5>
-        {% if followed|length == 0 %}
-        <li class="list-group-item">
-            <div class="flex-column">
-                None yet!
+<ul class="list-group m-1" id="test">
+    <h5>Followed users</h5>
+    {% if followed|length == 0 %}
+    <li class="list-group-item">
+        <div class="flex-column">
+            None yet!
+        </div>
+    </li>
+    {% else %}
+    {% for user in followed: %}
+    <li class="list-group-item">
+        <div class="flex-column">
+            <div>
+                <a style="color: black;" href="/users/search/{{user.username}}">@{{user.username}}</a>
             </div>
-        </li>
-        {% else %}
-        {% for user in followed: %}
-        <li class="list-group-item">
-            <div class="flex-column">
-                <div>
-                    <a style="color: black;" href="/users/search/{{user.username}}">@{{user.username}}</a>
-                </div>
-            </div>
-        </li>
-        {% endfor %}
-        {% endif %}
-    </ul>
+        </div>
+    </li>
+    {% endfor %}
+    {% endif %}
+</ul>
 
-    <ul class="list-group m-1">
-        {% if own_profile %}
-            <h5>User recommandantation<br>You don't want to miss out:</h5>
-            {% if recommandation|length == 0 %}
-            <li class="list-group-item">
-                <div class="flex-column">
-                    No recommandation for you.
-                </div>
-            </li>
-            {% else %}
-            {% for user in recommandation: %}
-            <li class="list-group-item">
-                <div class="flex-column">
-                    <div>
-                        <a style="color: black;" href="/users/search/{{user.username}}">@{{user.username}}</a>
-                    </div>
-                </div>
-            </li>
-            {% endfor %}
-            {% endif %}
-        {% endif %}
-    </ul>
+<ul class="list-group m-1">
+    {% if own_profile %}
+    <h5>User recommandantation<br>You don't want to miss out:</h5>
+    {% if recommandation|length == 0 %}
+    <li class="list-group-item">
+        <div class="flex-column">
+            No recommandation for you.
+        </div>
+    </li>
+    {% else %}
+    {% for user in recommandation: %}
+    <li class="list-group-item">
+        <div class="flex-column">
+            <div>
+                <a style="color: black;" href="/users/search/{{user.username}}">@{{user.username}}</a>
+            </div>
+        </div>
+    </li>
+    {% endfor %}
+    {% endif %}
+    {% endif %}
+</ul>
 {% endblock %}
-

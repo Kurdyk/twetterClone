@@ -44,6 +44,8 @@
 
         {% if g.user %}
 
+        <a class="nav-link mr-3" href="{{ url_for('users.search_for_email', username=g.user.username) }}">Profile</a>
+
         <a class="nav-link mr-3" id="logoutButton" class="nav-link" href="#" onclick="onLogout()">Log Out</a>
 
         <form class="form-inline" id="searchForm" action="/tweets/search_word" method="get" onsubmit="onSearch()">

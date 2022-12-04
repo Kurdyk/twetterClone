@@ -21,29 +21,30 @@ def get_all_tweets_raw():
     return jsonify(json_list=[tweet.serialize for tweet in tweets]), 200
 
 
+def map_tweets_to_authors(tweets):
+    db = get_db()
+    authors = [db.session.query(User).filter(
+        tweet.uid == User.id).first() for tweet in tweets]
+    return zip(tweets, authors)
+
+
 @bp.route("/", methods=["GET"])
 @login_required
 def index():
     db = get_db()
-    authors = list()
     likes = dict()
     tweets = db.session.query(Tweet).order_by(Tweet.id.desc()).all()
     likedTweets = db.session.query(Like).filter(
         Like.user_id == session["user_id"]).all()
 
-    for tweet in tweets:
-        authors.append(db.session.query(User.username).filter(
-            tweet.uid == User.id).all()[0][0])
     for like in likedTweets:
         likes[like.tweet_id] = like
-
-    return render_template('tweets/all_tweets.html', tweets_authors=zip(tweets, authors), liked_tweets=likes)
+    return render_template('tweets/all_tweets.html', tweets_authors=map_tweets_to_authors(tweets), liked_tweets=likes)
 
 
 @bp.route("/search_word", methods=["GET"])
 def search_for_word():
     db = get_db()
-    authors = list()
     tweets = list()
     # Do we need to sanitize the input?
     word = request.args.get('search').lower()  # the index is in lower case
@@ -51,15 +52,13 @@ def search_for_word():
         all_ids = tweet_index[word]
     except KeyError:
         # Empty page
-        return render_template('tweets/all_tweets.html', tweets_authors=zip(tweets, authors))
-    # removable when we figure out the join to get users and tweets together
+        return render_template('tweets/all_tweets.html', tweets_authors=map_tweets_to_authors(tweets))
+
     for tweet_id in all_ids:
         tweets += db.session.query(Tweet).order_by(Tweet.id.desc()
                                                    ).filter(Tweet.id == tweet_id).all()
-    for tweet in tweets:
-        authors.append(db.session.query(User.username).filter(
-            tweet.uid == User.id).all()[0][0])
-    return render_template('tweets/all_tweets.html', tweets_authors=zip(tweets, authors))
+
+    return render_template('tweets/all_tweets.html', tweets_authors=map_tweets_to_authors(tweets))
 
 
 def init_index():
