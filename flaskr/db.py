@@ -58,6 +58,7 @@ class User(db.Model):
     # needed for login so unique is a good idea
     email = db.Column(db.String(50), nullable=False, unique=True)
     password = db.Column(db.String(24), nullable=False)
+    avatar = db.Column(db.String(50), nullable=True)
 
     @property
     def serialize(self):
@@ -65,7 +66,8 @@ class User(db.Model):
             'id': self.id,
             'username': self.username,
             'email': self.email,
-            'password': self.password
+            'password': self.password,
+            'avatar': self.avatar
         }
 
 
@@ -91,8 +93,10 @@ class Tweet(db.Model):
 
 class Follow(db.Model):
     __tablename__ = "follows"
-    follower_id = db.Column(db.Integer, db.ForeignKey("user.id"), primary_key=True, nullable=False)
-    followed_id = db.Column(db.Integer, db.ForeignKey("user.id"), primary_key=True, nullable=False)
+    follower_id = db.Column(db.Integer, db.ForeignKey(
+        "user.id"), primary_key=True, nullable=False)
+    followed_id = db.Column(db.Integer, db.ForeignKey(
+        "user.id"), primary_key=True, nullable=False)
 
     @property
     def serialize(self):

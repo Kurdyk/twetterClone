@@ -66,6 +66,42 @@ window.onload()
         submit_unfollow_action.call();
     }
 
+    function submitAvatar() {
+        const submit_avatar_action = async () => {
+            var target_url = '/users/avatar/upload'
+            var file = document.getElementById('formFile').files[0]
+            const xhr = new XMLHttpRequest();
+            const fd = new FormData();
+
+            xhr.open("POST", target_url, true);
+            xhr.setRequestHeader("enctype", "multipart/form-data")
+            xhr.onreadystatechange = () => {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    alert('File Uploaded!');
+                    document.getElementById('formFile').value = ''
+                } else {
+                    alert('File failed to upload')
+                }
+            };
+            fd.append(file['name'], file);
+            fd.append('filename', file['name'])
+            xhr.send(fd);
+
+        };
+        submit_avatar_action.call()
+    }
+
+    window.onload = function () {
+        document.getElementById('formFile').onchange = function () {
+            var input = this.files[0]
+            if (input) {
+                document.getElementById('avatarSubmit').disabled = false
+            } else {
+                document.getElementById('avatarSubmit').disabled = true
+            }
+        }
+    }
+
 </script>
 <div class="py-5 h-50" style="background-color: #1DA1F2;">
     <div class="d-flex  m-3 justify-content-center align-items-center h-100">
@@ -89,7 +125,15 @@ window.onload()
                     </div>
                     <div class="d-flex pt-1 justify-content-center">
                         {% if own_profile : %}
-                        <button type="button" class="btn btn-danger m-1">Delete</button>
+                        <div class="col">
+                            <form class="mb-3" id="fileUploadForm" action="#" onsubmit="">
+                                <label for="formFile" class="form-label">Change your users avatar</label>
+                                <input class="form-control" type="file" id="formFile">
+                                <button class="btn btn-primary mt-1" id="avatarSubmit" onclick="submitAvatar()"
+                                    disabled>Submit</button>
+                            </form>
+                            <button type="button" class="btn btn-danger">Delete Account</button>
+                        </div>
                         {% else %}
                         {% if already_follows : %}
                         <button type="button" class="btn btn-primary m-1" id="followButton"
