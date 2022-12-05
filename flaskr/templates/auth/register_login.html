@@ -14,6 +14,7 @@ Login
     function onLogin() {
         const login_action = async () => {
             document.getElementById('loginError').style.display = 'none';
+            document.getElementById('registerError').style.display = 'none';
             let form_data = new FormData(document.getElementById('authForm'))
 
             if (page_action == "login") {
@@ -25,8 +26,12 @@ Login
                 "method": "POST",
                 "body": form_data
             })
-            if (!request.ok && request.status == 401) {
-                document.getElementById('loginError').style.display = 'block';
+            if (!request.ok) {
+                if (page_action == "login" && request.status == 401) {
+                    document.getElementById('loginError').style.display = 'block';
+                } else {
+                    document.getElementById('registerError').style.display = 'block';
+                }
             }
             if (request.redirected) {
                 window.location = request.url
@@ -38,6 +43,7 @@ Login
 
     window.onload = function () {
         document.getElementById('loginError').style.display = 'none';
+        document.getElementById('registerError').style.display = 'none';
         document.getElementById('loginSubmit').onclick = function (_) {
             onLogin()
         }
@@ -87,20 +93,23 @@ Login
                 <div id="loginError" class="invalid-feedback">
                     Oops! Invalid username or password.
                 </div>
+                <div id="registerError" class="invalid-feedback">
+                    Oops! That email is already in use.
+                </div>
             </form>
         </div>
         <button class="btn btn-primary m-3" id="loginSubmit" class="btn btn-primary" type="submit">Submit</button>
     </div>
     <div>
-    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
-            <ul class=flashes>
-                {% for category, message in messages %}
-                    <li class="{{ category }}">{{ message }}</li>
-                {% endfor %}
-            </ul>
+        <ul class=flashes>
+            {% for category, message in messages %}
+            <li class="{{ category }}">{{ message }}</li>
+            {% endfor %}
+        </ul>
         {% endif %}
-    {% endwith %}
+        {% endwith %}
 
     </div>
 </div>

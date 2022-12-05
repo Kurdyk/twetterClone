@@ -155,11 +155,10 @@ def generateTweet():
 
     openai.api_key = api_key
     response = openai.Completion.create(
-        model="text-davinci-002",
-        # Change this to change what the prompt does
-        prompt="Rewrite this in the style of William Shakespeare:\n\n"+content,
-        temperature=0,
-        max_tokens=60,
+        model="text-davinci-003",
+        prompt="Rewrite this in the style of a postmodern philosopher: "+content,
+        temperature=.9,
+        max_tokens=100,
         top_p=1.0,
         frequency_penalty=0.0,
         presence_penalty=0.0
