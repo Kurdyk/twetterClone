@@ -32,18 +32,28 @@ def map_tweets_to_authors(tweets):
     return zip(tweets, authors)
 
 
-@bp.route("/", methods=["GET"])
-@login_required
-def index():
-    db = get_db()
+def map_user_likes(rawLikes):
     likes = dict()
-    tweets = db.session.query(Tweet).order_by(Tweet.id.desc()).all()
-    likedTweets = db.session.query(Like).filter(
-        Like.user_id == session["user_id"]).all()
+    likedTweets = [like for like in rawLikes if (like.user_id == session['user_id'])]
+    likeCounts = {like.tweet_id: 0 for like in rawLikes}
 
     for like in likedTweets:
         likes[like.tweet_id] = like
-    return render_template('tweets/all_tweets.html', tweets_authors=map_tweets_to_authors(tweets), liked_tweets=likes, is_search=False)
+
+    for like in rawLikes:
+        likeCounts[like.tweet_id] += 1
+
+    return likes, likeCounts
+
+
+@bp.route("/", methods=["GET"])
+@login_required
+def index():
+    db = get_db()    
+    tweets = db.session.query(Tweet).order_by(Tweet.id.desc()).all()
+    likes, likeCounts = map_user_likes(db.session.query(Like).all())
+
+    return render_template('tweets/all_tweets.html', tweets_authors=map_tweets_to_authors(tweets), liked_tweets=likes, is_search=False, like_counts=likeCounts)
 
 
 @bp.route("/search_word", methods=["GET"])
@@ -63,14 +73,9 @@ def search_for_word():
         tweets += db.session.query(Tweet).order_by(Tweet.id.desc()
                                                    ).filter(Tweet.id == tweet_id).all()
 
-    likedTweets = db.session.query(Like).filter(
-        Like.user_id == session["user_id"]).all()
+    likes, likeCounts = map_user_likes(db.session.query(Like).all())
 
-    likes = dict()
-    for like in likedTweets:
-        likes[like.tweet_id] = like
-
-    return render_template('tweets/all_tweets.html', tweets_authors=map_tweets_to_authors(tweets), liked_tweets=likes, is_search=True)
+    return render_template('tweets/all_tweets.html', tweets_authors=map_tweets_to_authors(tweets), liked_tweets=likes, is_search=True, like_counts=likeCounts)
 
 
 def init_index():

@@ -221,6 +221,15 @@
                     onclick="deleteTweet({{tweet.id}})">Delete
                 </button>
                 {% endif %}
+                <h5 class="align-self-end">
+                    {% if not like_counts[tweet.id] %}
+                    0 likes
+                    {% elif like_counts[tweet.id] == 1 %}
+                    {{like_counts[tweet.id]}} like
+                    {% else %}
+                    {{like_counts[tweet.id]}} likes
+                    {% endif %}
+                </h5>
             </div>
         </div>
     </li>
