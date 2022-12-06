@@ -183,13 +183,35 @@
                     </div>
                     <div class="d-flex justify-content-around">
                         {% if tweet.id in liked_tweets %}
-                        <button id="buttonUnlike" class="btn btn-default"
-                            onclick="likeActionTweet({{tweet.id}}, false)"><img
-                                src="/static/assets/heart_icon_filled_24.png" width="24" height="24"></button>
+                        <div class="row">
+                            <button id="buttonUnlike" class="btn btn-default"
+                                onclick="likeActionTweet({{tweet.id}}, false)"><img
+                                    src="/static/assets/heart_icon_filled_24.png" width="24" height="24"></button>
+                            <h5 class="align-self-end">
+                                {% if not like_counts[tweet.id] %}
+                                0 likes
+                                {% elif like_counts[tweet.id] == 1 %}
+                                {{like_counts[tweet.id]}} like
+                                {% else %}
+                                {{like_counts[tweet.id]}} likes
+                                {% endif %}
+                            </h5>
+                        </div>
                         {% else %}
-                        <button id="buttonLike" class="btn btn-default"
-                            onclick="likeActionTweet({{tweet.id}}, true)"><img
-                                src="/static/assets/heart_icon_outline_24.png" width="24" height="24"></button>
+                        <div class="row">
+                            <button id="buttonLike" class="btn btn-default"
+                                onclick="likeActionTweet({{tweet.id}}, true)"><img
+                                    src="/static/assets/heart_icon_outline_24.png" width="24" height="24"></button>
+                            <h5 class="align-self-end">
+                                {% if not like_counts[tweet.id] %}
+                                0 likes
+                                {% elif like_counts[tweet.id] == 1 %}
+                                {{like_counts[tweet.id]}} like
+                                {% else %}
+                                {{like_counts[tweet.id]}} likes
+                                {% endif %}
+                            </h5>
+                        </div>
                         {% endif %}
                         <button id="buttonRetweet" class="btn btn-default" onclick="commentTweet({{tweet.id}})"><img
                                 src="/static/assets/chat_icon_outline_24.png" width="24" height="24"></button>

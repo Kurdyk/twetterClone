@@ -11,7 +11,7 @@ from sqlalchemy import update
 from flaskr.db import User, get_db, Tweet, Follow, Like
 from flaskr.auth import login_required
 from flaskr.follows import is_following, get_followed, get_followers, follow_graph
-from flaskr.tweets import delete_from_index
+from flaskr.tweets import delete_from_index, map_user_likes
 from werkzeug.utils import secure_filename
 
 
@@ -61,11 +61,11 @@ def search_for_email(username):
     followers = get_followers(username)
     followed = get_followed(username)
     recommandation = follow_graph.recommandation(session["user_id"], 5)
+    _, likeCounts = map_user_likes(db.session.query(Like).filter(Like.user_id == session['user_id']).all())
     return render_template('users/profile.html', user=user, tweets=tweets,
                            own_profile=own_profile, already_follows=already_follows,
-                           followed=followed, followers=followers, nb_followers=len(
-                               followers),
-                           recommandation=recommandation)
+                           followed=followed, followers=followers, nb_followers=len(followers),
+                           recommandation=recommandation, like_counts=likeCounts)
 
 
 @bp.route("/delete", methods=["DELETE"])
