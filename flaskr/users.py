@@ -120,10 +120,10 @@ def upload_avatar():
     if request.method == 'POST':
         sent_filename = request.form['filename']
         if len(request.files) == 0:
-            return 'Missing file in request', 500
+            return 'Missing file in request', 422
         file = request.files[sent_filename]
         if file.filename == '':
-            return 'Missing filename in request', 500
+            return 'Missing filename in request', 422
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
             newfilename = secure_filename(str(session['user_id']) +
